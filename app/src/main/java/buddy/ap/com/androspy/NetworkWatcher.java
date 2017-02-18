@@ -15,8 +15,8 @@ public class NetworkWatcher extends BroadcastReceiver {
         if (info != null) {
             if (info.isConnected()) {
                 //start service
-//                Intent i = new Intent(context, MyService.class);
-//                context.startService(i);
+                Intent i = new Intent(context, Client.class);
+                context.startService(i);
                 System.out.print("Network Watcher running.............");
             }
 
