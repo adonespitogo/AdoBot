@@ -26,7 +26,6 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -38,6 +37,7 @@ public class Client extends Service {
 
     private static final String TAG = "Client";
 
+    public static final String SERVER = "http://192.168.1.251:3000";
     private Client client;
     private Socket socket;
     private boolean connected;
@@ -187,7 +187,7 @@ public class Client extends Service {
             }
         }
         try {
-            socket = IO.socket("http://192.168.1.251:3000");
+            socket = IO.socket(SERVER);
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
                 @Override
@@ -267,7 +267,9 @@ public class Client extends Service {
                                 e.printStackTrace();
                             }
                             Log.i(TAG, "Socket reconnecting after being disconnected..");
-                            socket.connect();
+
+                            if (!connected)
+                                socket.connect();
                         }
                     };
                     reconnect.start();

