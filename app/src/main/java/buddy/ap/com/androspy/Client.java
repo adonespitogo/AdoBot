@@ -55,88 +55,44 @@ public class Client extends Service {
         return socket;
     }
 
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
     public boolean isConnected() {
         return connected;
-    }
-
-    public void setConnected(boolean connected) {
-        this.connected = connected;
     }
 
     public boolean isRegistered() {
         return registered;
     }
 
-    public void setRegistered(boolean registered) {
-        this.registered = registered;
-    }
-
     public String getUid() {
         return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getDevice() {
         return device;
     }
 
-    public void setDevice(String device) {
-        this.device = device;
-    }
-
     public String getSdk() {
         return sdk;
-    }
-
-    public void setSdk(String sdk) {
-        this.sdk = sdk;
     }
 
     public String getProvider() {
         return provider;
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
     public String getPhone() {
         return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public int getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public double getLongitude() {
         return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
     }
 
     private final LocationListener locationListener = new LocationListener() {
