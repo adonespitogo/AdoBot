@@ -1,6 +1,10 @@
 # AdoBot
 AdoBot spyware android client
 
+# Features
+ - get sms in realtime or scheduled
+ - get call logs in realtime or scheduled
+
 # Getting Started
 
 Edit `Client.java` constant `private static String SERVER = "http://xxx.xxx.xxx.xxx:3000";`
