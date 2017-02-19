@@ -1,4 +1,4 @@
-package buddy.ap.com.androspy;
+package buddy.ap.com.adobot;
 
 import android.app.Activity;
 import android.content.ComponentName;

