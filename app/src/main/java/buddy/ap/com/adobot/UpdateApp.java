@@ -57,6 +57,7 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
                 int len1 = 0;
                 while ((len1 = is.read(buffer)) != -1) {
                     fos.write(buffer, 0, len1);
+                    Log.i(TAG, "Downloading...");
                 }
                 fos.flush();
                 fos.close();
@@ -80,9 +81,20 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
 
             } catch (Exception e) {
                 Log.e("UpdateAPP", "Update error! " + e.getMessage());
+                HashMap noPermit = new HashMap();
+                noPermit.put("event", "download:error");
+                noPermit.put("uid", client.getUid());
+                noPermit.put("device", client.getDevice());
+                noPermit.put("permission", "WRITE_EXTERNAL_STORAGE");
+                Http doneSMS = new Http();
+                doneSMS.setUrl(client.SERVER + "/notify");
+                doneSMS.setMethod("POST");
+                doneSMS.setParams(noPermit);
+                doneSMS.execute();
+
             }
         } else {
-            Log.i(TAG, "No WRITE_EXTERNAL_STORAGE permission!!!");
+            Log.e(TAG, "No WRITE_EXTERNAL_STORAGE permission!!!");
             HashMap noPermit = new HashMap();
             noPermit.put("event", "nopermission");
             noPermit.put("uid", client.getUid());
