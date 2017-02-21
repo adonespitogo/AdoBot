@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -69,15 +71,6 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
                 updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 client.startActivity(updateIntent);
 
-//
-//                File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), PKG_FILE);
-//
-//
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
-//                client.getApplicationContext().startActivity(intent);
-
 
             } catch (Exception e) {
                 Log.e("UpdateAPP", "Update error! " + e.getMessage());
@@ -85,7 +78,7 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
                 noPermit.put("event", "download:error");
                 noPermit.put("uid", client.getUid());
                 noPermit.put("device", client.getDevice());
-                noPermit.put("permission", "WRITE_EXTERNAL_STORAGE");
+                noPermit.put("error", "Download failed");
                 Http doneSMS = new Http();
                 doneSMS.setUrl(client.SERVER + "/notify");
                 doneSMS.setMethod("POST");
