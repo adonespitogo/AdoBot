@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.concurrent.RunnableFuture;
 
 import http.Http;
 import io.socket.client.Ack;
@@ -182,6 +183,21 @@ public class Client extends Service {
                 public void call(Object... args) {
                     connected = false;
                     Log.i(TAG, "\n\nSocket disconnected...\n\n");
+                    final Thread reconnect = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "Socket reconnecting...");
+                            try {
+                                Thread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if (!connected)
+                                socket.connect();
+                        }
+                    });
+
+                    reconnect.start();
                 }
 
             });

