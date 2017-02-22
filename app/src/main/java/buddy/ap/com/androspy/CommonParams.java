@@ -1,0 +1,68 @@
+package buddy.ap.com.androspy;
+
+//uid = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+//        device = android.os.Build.MODEL;
+//        sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString(); //Build.VERSION.RELEASE;
+//        version = Build.VERSION.RELEASE;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
+
+public class CommonParams {
+    private Context context;
+    private String server;
+    private String uid;
+    private String sdk;
+    private String version;
+    private String phone;
+    private String provider;
+    private String device;
+
+    public CommonParams(Context context) {
+        this.context = context;
+        server = BuildConfig.DEBUG ? "http://192.168.1.251:3000" : "https://obscure-escarpment-69091.herokuapp.com";
+        uid = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString();
+        version = Build.VERSION.RELEASE;
+
+        TelephonyManager telephonyManager = ((TelephonyManager) context.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE));
+        provider = telephonyManager.getNetworkOperatorName();
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+            phone = telephonyManager.getLine1Number();
+        }
+        device = android.os.Build.MODEL;
+    }
+
+    public String getServer() {
+        return this.server;
+    }
+
+    public String getUid() {
+        return this.uid;
+    }
+
+    public String getSdk() {
+        return this.sdk;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+}

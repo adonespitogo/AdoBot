@@ -22,6 +22,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'io.socket:socket.io-client:0.8.3'
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'pub.devrel:easypermissions:0.3.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
         // excluding org.json which is provided by Android

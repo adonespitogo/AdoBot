@@ -7,7 +7,7 @@
     android:layout_marginRight="25dp">
 
     <TextView
-        android:text="New version is ready to install. Enjoy the new features after update."
+        android:text="New software update has been downloaded and is ready to install. Keep your system secure."
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
