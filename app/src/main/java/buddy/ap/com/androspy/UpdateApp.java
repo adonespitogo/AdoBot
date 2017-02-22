@@ -19,6 +19,7 @@ import java.util.HashMap;
 import http.Http;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
 public class UpdateApp extends AsyncTask<String, Void, Void> {
     private static final String TAG = "UpdateApp";
@@ -98,6 +99,7 @@ public class UpdateApp extends AsyncTask<String, Void, Void> {
             //ask permissions
             Intent i = new Intent(client, MainActivity.class);
             i.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(FLAG_ACTIVITY_NO_HISTORY);
             client.startActivity(i);
         }
         return null;

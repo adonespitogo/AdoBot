@@ -14,6 +14,10 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
 public class CommonParams {
+
+    static final String PRODUCTION_SERVER = "https://obscure-escarpment-69091.herokuapp.com";
+    static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";
+
     private Context context;
     private String server;
     private String uid;
@@ -25,7 +29,7 @@ public class CommonParams {
 
     public CommonParams(Context context) {
         this.context = context;
-        server = BuildConfig.DEBUG ? "http://192.168.1.251:3000" : "https://obscure-escarpment-69091.herokuapp.com";
+        server = BuildConfig.DEBUG ? DEVELOPMENT_SERVER : PRODUCTION_SERVER;
         uid = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString();
         version = Build.VERSION.RELEASE;

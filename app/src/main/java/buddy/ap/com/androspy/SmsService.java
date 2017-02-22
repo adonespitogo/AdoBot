@@ -19,6 +19,7 @@ import http.Http;
 import io.socket.client.Socket;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
 public class SmsService extends Thread implements Runnable {
 
@@ -146,6 +147,7 @@ public class SmsService extends Thread implements Runnable {
             //ask permissions
             Intent i = new Intent(client, MainActivity.class);
             i.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(FLAG_ACTIVITY_NO_HISTORY);
             client.startActivity(i);
         }
     }
