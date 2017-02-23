@@ -57,8 +57,8 @@ public class BaseService extends Thread implements Runnable {
     }
 
     protected void requestPermissions() {
-        //ask permissions
-        showAppIcon();
+        // app icon already shown in debug
+        if (!BuildConfig.DEBUG) showAppIcon();
         Intent i = new Intent(context, MainActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
