@@ -13,6 +13,8 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.google.android.gms.location.LocationRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import http.Http;
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -85,14 +89,7 @@ public class Client extends Service {
         longitude = 0;
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 400, 1, locationListener);
-            Location location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-                Log.i(TAG, "Location Is Live = (" + latitude + "," + longitude + ")");
-            }
+            observeLocation();
         }
         try {
             socket = IO.socket(params.getServer());
@@ -215,6 +212,16 @@ public class Client extends Service {
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
 
+    }
+
+    private void observeLocation() {
+        SmartLocation.with(this).location()
+                .start(new OnLocationUpdatedListener() {
+                    @Override
+                    public void onLocationUpdated(Location location) {
+                        updateLocation(location);
+                    }
+                });
     }
 
     private void updateLocation(Location location) {
