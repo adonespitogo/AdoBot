@@ -1,8 +1,11 @@
 package http;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -19,6 +22,8 @@ public class HttpRequest implements Runnable {
 
     private static final String TAG = "HttpRequest";
     public static final String USER_AGENT = "Mozilla/5.0";
+    public static final String METHOD_POST = "POST";
+    public static final String METHOD_GET= "GET";
 
     protected HttpCallback callback;
     protected Map<String,String> params;
@@ -51,7 +56,7 @@ public class HttpRequest implements Runnable {
             for(String s:this.params.keySet()){
                 if (params.get(s) != null) {
                     paramBuilder.append("&"+s+"=");
-                    paramBuilder.append(URLEncoder.encode(params.get(s), "UTF-8"));
+                    paramBuilder.append(URLEncoder.encode(String.valueOf(params.get(s)), "UTF-8"));
                 }
             }
 
