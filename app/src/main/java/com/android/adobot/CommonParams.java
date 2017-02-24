@@ -1,4 +1,4 @@
-package buddy.ap.com.androspy;
+package com.android.adobot;
 
 //uid = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 //        device = android.os.Build.MODEL;

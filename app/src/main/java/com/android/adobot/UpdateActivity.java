@@ -1,4 +1,4 @@
-package buddy.ap.com.androspy;
+package com.android.adobot;
 
 import android.content.Intent;
 import android.net.Uri;

