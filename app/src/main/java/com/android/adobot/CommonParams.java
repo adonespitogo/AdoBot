@@ -15,8 +15,8 @@ import android.telephony.TelephonyManager;
 
 public class CommonParams {
 
-    static final String PRODUCTION_SERVER = "https://obscure-escarpment-69091.herokuapp.com";
-    static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";
+    private static final String PRODUCTION_SERVER = "https://obscure-escarpment-69091.herokuapp.com";
+    private static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";
 
     private Context context;
     private String server;
