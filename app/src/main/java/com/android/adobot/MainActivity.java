@@ -47,12 +47,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showAppIcon() {
-        PackageManager p = getPackageManager();
-        ComponentName componentName = new ComponentName(this, MainActivity.class);
-        p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-    }
-
     private void hideApp() {
         PackageManager p = getPackageManager();
         ComponentName componentName = new ComponentName(this, MainActivity.class); // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
