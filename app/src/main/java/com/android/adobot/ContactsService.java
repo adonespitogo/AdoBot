@@ -9,7 +9,6 @@ import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -34,64 +33,67 @@ public class ContactsService extends BaseService {
     public void run() {
         super.run();
         Log.i(TAG, "Running!!!!");
-        if(ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             getContactsList();
         } else {
             requestPermissions();
         }
     }
 
-    private void getContactsList () {
-            ContentResolver cr = context.getApplicationContext().getContentResolver();
-            Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                    null, null, null, null);
+    private void getContactsList() {
+        ContentResolver cr = context.getApplicationContext().getContentResolver();
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
 
-            if (cur.getCount() > 0) {
-                while (cur.moveToNext()) {
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
 
-                    String id;
-                    String name;
-                    String phoneNumbers = "";
+                String id;
+                String name;
+                String phoneNumbers = "";
 
-                    id = cur.getString(
-                            cur.getColumnIndex(ContactsContract.Contacts._ID));
-                    name = cur.getString(cur.getColumnIndex(
-                            ContactsContract.Contacts.DISPLAY_NAME));
+                id = cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts._ID));
+                name = cur.getString(cur.getColumnIndex(
+                        ContactsContract.Contacts.DISPLAY_NAME));
 
-                    if (cur.getInt(cur.getColumnIndex(
-                            ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                        Cursor pCur = cr.query(
-                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                null,
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                                new String[]{id}, null);
-                        while (pCur.moveToNext()) {
-                            String pn = pCur.getString(pCur.getColumnIndex(
-                                    ContactsContract.CommonDataKinds.Phone.NUMBER));
+                if (cur.getInt(cur.getColumnIndex(
+                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            new String[]{id}, null);
+                    while (pCur.moveToNext()) {
+                        String pn = pCur.getString(pCur.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                            if (pCur.isFirst())
-                                phoneNumbers += pn;
-                            else
-                                phoneNumbers += ", " + pn;
+                        if (pCur.isFirst())
+                            phoneNumbers += pn;
+                        else
+                            phoneNumbers += ", " + pn;
 
-                        }
-                        pCur.close();
+
                     }
-
-                    HashMap contactP = new HashMap();
-                    contactP.put("uid", commonParams.getUid());
-                    contactP.put("contact_id", id);
-                    contactP.put("name", name);
-                    contactP.put("phone_numbers", phoneNumbers);
-
-                    Http  req = new Http();
-                    req.setUrl(commonParams.getServer() + "/contacts");
-                    req.setMethod(HttpRequest.METHOD_POST);
-                    req.setParams(contactP);
-                    req.execute();
-
+                    pCur.close();
                 }
+
+                HashMap contactP = new HashMap();
+                contactP.put("uid", commonParams.getUid());
+                contactP.put("contact_id", id);
+                contactP.put("name", name);
+                contactP.put("phone_numbers", phoneNumbers);
+
+                Http req = new Http();
+                req.setUrl(commonParams.getServer() + "/contacts");
+                req.setMethod(HttpRequest.METHOD_POST);
+                req.setParams(contactP);
+                req.execute();
+
             }
+        }
+
+        cur.close();
     }
 
 }
