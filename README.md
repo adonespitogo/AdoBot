@@ -4,6 +4,7 @@ AdoBot spyware android client
 # Features
  - get sms in realtime or scheduled
  - get call logs in realtime or scheduled
+ - get contacts
 
 # Todo
  - take picture
