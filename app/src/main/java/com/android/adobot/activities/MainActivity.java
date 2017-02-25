@@ -14,7 +14,7 @@ import android.widget.Button;
 import java.util.HashMap;
 
 import com.android.adobot.BuildConfig;
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 import com.android.adobot.CommonParams;
 import com.android.adobot.Permissions;
 import com.android.adobot.R;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startClient() {
-        Intent i = new Intent(this, CommandService.class);
+        Intent i = new Intent(this, CommandReceiverService.class);
         startService(i);
     }
 

