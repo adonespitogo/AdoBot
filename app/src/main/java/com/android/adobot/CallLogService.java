@@ -65,6 +65,7 @@ public class CallLogService extends BaseService{
 
             if (managedCursor.moveToFirst()) {
                 do {
+                    Log.i(TAG, "This number: " + this.numlogs);
                     String phNumber = managedCursor.getString(number);
                     String nameS = getContactName(context.getApplicationContext(), phNumber);
                     String callType = managedCursor.getString(type);
@@ -72,25 +73,21 @@ public class CallLogService extends BaseService{
                     Date callDayTime = new Date(Long.valueOf(callDate));
                     SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String callDuration = managedCursor.getString(duration);
-                    try {
-                        HashMap p = new HashMap();
-                        p.put("uid", commonParams.getUid());
-                        p.put("call_id", Integer.toString(id));
-                        p.put("type", callType);
-                        p.put("phone", phNumber);
-                        p.put("name", nameS);
-                        p.put("date", dt.format(callDayTime));
-                        p.put("duration", callDuration);
 
-                        Http req = new Http();
-                        req.setMethod("POST");
-                        req.setUrl(commonParams.getServer() + POSTURL);
-                        req.setParams(p);
-                        req.execute();
+                    HashMap p = new HashMap();
+                    p.put("uid", commonParams.getUid());
+                    p.put("call_id", Integer.toString(id));
+                    p.put("type", callType);
+                    p.put("phone", phNumber);
+                    p.put("name", nameS);
+                    p.put("date", dt.format(callDayTime));
+                    p.put("duration", callDuration);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Http req = new Http();
+                    req.setMethod("POST");
+                    req.setUrl(commonParams.getServer() + POSTURL);
+                    req.setParams(p);
+                    req.execute();
                     this.numlogs--;
                 } while (managedCursor.moveToNext() && this.numlogs > 0);
             }
