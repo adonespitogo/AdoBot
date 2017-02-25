@@ -34,4 +34,13 @@ public class UpdateActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
         getApplicationContext().startActivity(intent);
     }
+
+    @Override
+    protected void onDestroy() {
+        //delete file on exit to minimize traces
+        super.onDestroy();
+        File updateFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), UpdateService.PKG_FILE);
+        if (updateFile.exists())
+            updateFile.delete();
+    }
 }
