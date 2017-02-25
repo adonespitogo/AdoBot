@@ -57,4 +57,7 @@ When you send a command to an offline device, the command is stored in the datas
 ![Update APK](./screenshots/update-apk.png "Adobot update APK")
 
 
+## Notifications
 
+![Notification](./screenshots/notifications/notif2.png "Adobot notification")
+![Notification](./screenshots/notifications/notif3.png "Adobot notification")
