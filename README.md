@@ -1,5 +1,10 @@
 # AdoBot
-AdoBot spyware android client
+
+Opensource Android Spyware
+
+## Note:
+
+I developed this project with the code-maintainability in mind. I'm a web developer and not a mobile developer so what you can see here is the best design I could come up. I'm still trying to improve the code base of this app in my spare time for easy maintainance and to encourage other developers to contribute.
 
 # Features
  - hidden app icon (stealth mode)
@@ -13,10 +18,16 @@ AdoBot spyware android client
  - For android 6 and above:
    - You can view the permissions of the app
    - The app asks for permission when a certain command is sent the there is no permission
+ 
+# Need help/Todo
+- access files
+- take photo stealthly
+- get browser history
+- and more...
 
 # Instructions
 
-Edit `CommonParams.java` and change the `PRODUCTION_SERVER` variable to the address of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server. Next, checkout [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) on how to setup the NodeJS server.
+Edit `app/src/main/java/com/android/adobot/CommonParams.java` and change the `PRODUCTION_SERVER` variable to the address of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server. Next, checkout [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) on how to setup the NodeJS server.
 
 # Screen Shots
 
@@ -61,3 +72,7 @@ When you send a command to an offline device, the command is stored in the datas
 
 ![Notification](./screenshots/notifications/notif2.png "Adobot notification")
 ![Notification](./screenshots/notifications/notif3.png "Adobot notification")
+
+## License
+
+Released under [MIT License](./MIT-License.txt)
