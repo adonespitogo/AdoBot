@@ -16,7 +16,7 @@ AdoBot spyware android client
 
 # Instructions
 
-Edit `CommonParams.java` and change the `PRODUCTION_SERVER` variable to the address of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server. Next, checkout [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) on how to setup the NodeJS server.
+Edit `app/src/main/java/com/android/adobot/CommonParams.java` and change the `PRODUCTION_SERVER` variable to the address of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server. Next, checkout [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) on how to setup the NodeJS server.
 
 # Screen Shots
 
