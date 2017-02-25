@@ -1,5 +1,12 @@
 # AdoBot
-AdoBot spyware android client
+
+)pensource android spyware.
+
+--------------
+
+## Note:
+
+I developed this project with the code-maintainability in mind. I'm a web developer and not a mobile developer so what you can see here is the best design I could come up. I'm still trying to improve the code base of this app in my spare time for easy maintainance and to encourage other developers to contribute.
 
 # Features
  - hidden app icon (stealth mode)
@@ -13,6 +20,12 @@ AdoBot spyware android client
  - For android 6 and above:
    - You can view the permissions of the app
    - The app asks for permission when a certain command is sent the there is no permission
+ 
+ # Need help/Todo
+  - access files
+  - take photo stealthly
+  - get browser history
+  - and more...
 
 # Instructions
 
