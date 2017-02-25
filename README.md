@@ -47,7 +47,7 @@ Edit `app/src/main/java/com/android/adobot/CommonParams.java` and change the `PR
 
 SMS thread is a pop up modal
 
-![SMS Thread Tab](./screenshots/sms-thread-4.png "Adobot SMS Thread Tab")
+![SMS Thread Tab](./screenshots/sms-thread-5.png "Adobot SMS Thread Tab")
 
 ## Call Logs Tab
 
