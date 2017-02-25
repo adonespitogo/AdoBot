@@ -1,8 +1,6 @@
 # AdoBot
 
-)pensource android spyware.
-
---------------
+Opensource Android Spyware
 
 ## Note:
 
