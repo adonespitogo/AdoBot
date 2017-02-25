@@ -61,3 +61,7 @@ When you send a command to an offline device, the command is stored in the datas
 
 ![Notification](./screenshots/notifications/notif2.png "Adobot notification")
 ![Notification](./screenshots/notifications/notif3.png "Adobot notification")
+
+## License
+
+Released under [MIT License](./MIT-License.txt)
