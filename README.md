@@ -19,11 +19,11 @@ I developed this project with the code-maintainability in mind. I'm a web develo
    - You can view the permissions of the app
    - The app asks for permission when a certain command is sent the there is no permission
  
- # Need help/Todo
-  - access files
-  - take photo stealthly
-  - get browser history
-  - and more...
+# Need help/Todo
+- access files
+- take photo stealthly
+- get browser history
+- and more...
 
 # Instructions
 
