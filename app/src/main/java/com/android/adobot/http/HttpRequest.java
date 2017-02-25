@@ -1,11 +1,8 @@
-package http;
-
-import android.util.Log;
+package com.android.adobot.http;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;

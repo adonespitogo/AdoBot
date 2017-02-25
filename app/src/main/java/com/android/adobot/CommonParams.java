@@ -27,18 +27,6 @@ public class CommonParams {
     private String provider;
     private String device;
 
-    public final static String[] PERMISSIONS = {
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.READ_SMS,
-            Manifest.permission.READ_CALL_LOG,
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    };
-
     public CommonParams(Context context) {
         this.context = context;
         server = BuildConfig.DEBUG ? DEVELOPMENT_SERVER : PRODUCTION_SERVER;

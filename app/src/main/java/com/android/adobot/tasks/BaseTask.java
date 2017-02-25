@@ -1,4 +1,4 @@
-package com.android.adobot;
+package com.android.adobot.tasks;
 
 import android.Manifest;
 import android.content.ComponentName;
@@ -8,24 +8,27 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import com.android.adobot.BuildConfig;
+import com.android.adobot.CommonParams;
+import com.android.adobot.activities.MainActivity;
+
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
 /**
  * Created by adones on 2/22/17.
  */
 
-public class BaseService extends Thread implements Runnable {
+public class BaseTask extends Thread implements Runnable {
 
     protected Context context;
+    protected CommonParams commonParams;
 
     protected void setContext(Context context) {
         this.context = context;
+        this.commonParams = new CommonParams(context);
     }
 
     protected void showAppIcon() {

