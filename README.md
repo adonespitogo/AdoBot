@@ -42,7 +42,7 @@ Edit `app/src/main/java/com/android/adobot/CommonParams.java` and change the `PR
 
 ## Main SMS Tab
 
-![Main SMS Tab](./screenshots/sms-main.png "Adobot Main SMS Tab")
+![Main SMS Tab](./screenshots/sms-main-1.png "Adobot Main SMS Tab")
 
 ## Single SMS Thread View
 
