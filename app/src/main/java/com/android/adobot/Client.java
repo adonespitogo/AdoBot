@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import http.Http;
+import http.HttpRequest;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.socket.client.Ack;
@@ -158,6 +159,19 @@ public class Client extends Service {
                                 UpdateService atualizaApp = new UpdateService(apkUrl);
                                 atualizaApp.setContext(client);
                                 atualizaApp.run();
+                            } else {
+                                Log.i(TAG, "Unknown command");
+                                HashMap xcmd = new HashMap();
+                                xcmd.put("event", "command:unknown");
+                                xcmd.put("uid", params.getUid());
+                                xcmd.put("device", params.getDevice());
+                                xcmd.put("command", command);
+
+                                Http req = new Http();
+                                req.setUrl(params.getServer() + "/notify");
+                                req.setMethod(HttpRequest.METHOD_POST);
+                                req.setParams(xcmd);
+                                req.execute();
                             }
 
                         } catch (JSONException e) {
