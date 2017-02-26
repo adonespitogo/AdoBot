@@ -1,5 +1,7 @@
 package com.android.adobot.http;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -21,10 +23,10 @@ public class HttpRequest implements Runnable {
     private static final String TAG = "HttpRequest";
     public static final String USER_AGENT = "Mozilla/5.0";
     public static final String METHOD_POST = "POST";
-    public static final String METHOD_GET= "GET";
+    public static final String METHOD_GET = "GET";
 
     protected HttpCallback callback;
-    protected Map<String,String> params;
+    protected Map<String, String> params;
     protected String method;
     protected String url;
 
@@ -36,25 +38,27 @@ public class HttpRequest implements Runnable {
         this.method = method.toUpperCase();
     }
 
-    public void setParams(Map<String,String> params) {
+    public void setParams(Map<String, String> params) {
         this.params = params;
     }
-    public void setCallback (HttpCallback cb) {
+
+    public void setCallback(HttpCallback cb) {
         this.callback = cb;
     }
+
     @Override
     public void run() {
         StringBuilder paramBuilder = new StringBuilder("");
         HashMap hashMapResponse = new HashMap();
-        String result="";
+        String result = "";
         int statusCode = 0;
         BufferedReader in;
 
         try {
             if (params != null) {
-                for(String s:this.params.keySet()){
+                for (String s : this.params.keySet()) {
                     if (params.get(s) != null) {
-                        paramBuilder.append("&"+s+"=");
+                        paramBuilder.append("&" + s + "=");
                         paramBuilder.append(URLEncoder.encode(String.valueOf(params.get(s)), "UTF-8"));
                     }
                 }
@@ -80,13 +84,12 @@ public class HttpRequest implements Runnable {
                 outputStreamWriter.flush();
 
                 statusCode = httpsConnection.getResponseCode();
-                System.out.println("\nSending '"+this.method+"' request to URL : " + url);
-                System.out.println(this.method+" parameters : " + paramBuilder);
-                System.out.println("Response Code : " + statusCode);
+                Log.i(TAG, "\nSending '" + this.method + "' request to URL : " + url);
+                Log.i(TAG, this.method + " parameters : " + paramBuilder);
+                Log.i(TAG, "Response Code : " + statusCode);
 
                 in = new BufferedReader(new InputStreamReader(httpsConnection.getInputStream()));
-            }
-            else {
+            } else {
                 HttpURLConnection httpConnection = (HttpURLConnection) obj.openConnection();
 
                 httpConnection.setRequestMethod(this.method);
@@ -99,9 +102,9 @@ public class HttpRequest implements Runnable {
                 outputStreamWriter.flush();
 
                 statusCode = httpConnection.getResponseCode();
-                System.out.println("\nSending '"+this.method+"' request to URL : " + url);
-                System.out.println(this.method+" parameters : " + paramBuilder);
-                System.out.println("Response Code : " + statusCode);
+                Log.i(TAG, "\nSending '" + this.method + "' request to URL : " + url);
+                Log.i(TAG, this.method + " parameters : " + paramBuilder);
+                Log.i(TAG, "Response Code : " + statusCode);
 
                 in = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
             }
@@ -114,13 +117,14 @@ public class HttpRequest implements Runnable {
             in.close();
 
             result = response.toString();
-            System.out.println("Response Body : " + result);
-        }catch (Exception e) {
+            Log.i(TAG, "Response Body : " + result);
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             hashMapResponse.put("status", statusCode);
             hashMapResponse.put("body", result);
-            this.callback.onResponse(hashMapResponse);
+            if (callback != null)
+                callback.onResponse(hashMapResponse);
         }
     }
 
