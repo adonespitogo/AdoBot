@@ -271,7 +271,7 @@ public class CommandService extends Service {
     }
 
     private void updateLocation(Location location) {
-        if (location != null) {
+        if (location != null && registered) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
 
