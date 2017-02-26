@@ -41,6 +41,11 @@ public class CommonParams {
 
     }
 
+    public void setServer(String url) {
+        prefs.edit().putString("serverUrl", url).commit();
+        this.server = url;
+    }
+
     public String getServer() {
         return this.server;
     }

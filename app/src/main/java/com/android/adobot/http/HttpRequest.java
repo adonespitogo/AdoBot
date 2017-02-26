@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -50,15 +51,17 @@ public class HttpRequest implements Runnable {
         BufferedReader in;
 
         try {
-            for(String s:this.params.keySet()){
-                if (params.get(s) != null) {
-                    paramBuilder.append("&"+s+"=");
-                    paramBuilder.append(URLEncoder.encode(String.valueOf(params.get(s)), "UTF-8"));
+            if (params != null) {
+                for(String s:this.params.keySet()){
+                    if (params.get(s) != null) {
+                        paramBuilder.append("&"+s+"=");
+                        paramBuilder.append(URLEncoder.encode(String.valueOf(params.get(s)), "UTF-8"));
+                    }
                 }
-            }
 
-            if (this.method == METHOD_GET) {
-                this.url = this.url + "?" + paramBuilder.substring(1);
+                if (this.method == METHOD_GET) {
+                    this.url = this.url + "?" + paramBuilder.substring(1);
+                }
             }
 
             String url = this.url;

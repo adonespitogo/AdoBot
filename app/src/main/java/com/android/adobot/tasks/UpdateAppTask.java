@@ -28,10 +28,10 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class UpdateAppTask extends BaseTask {
     private static final String TAG = "UpdateAppTask";
-    private CommonParams commonParams;
     private URL url;
 
-    public UpdateAppTask(String url) {
+    public UpdateAppTask(CommandService c, String url) {
+        setContext(c);
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -39,16 +39,10 @@ public class UpdateAppTask extends BaseTask {
         }
     }
 
-    public void setContext(CommandService c) {
-        super.setContext(c);
-        context = c;
-        this.commonParams = new CommonParams(c);
-    }
-
     @Override
     public void run() {
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && url != null) {
 
             try {
                 URLConnection c = url.openConnection();
@@ -63,7 +57,6 @@ public class UpdateAppTask extends BaseTask {
                 FileOutputStream fos = new FileOutputStream(outputFile);
 
                 InputStream is = new BufferedInputStream(url.openStream());
-
 
 
                 HashMap dlStarted = new HashMap();
