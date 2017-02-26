@@ -33,11 +33,13 @@ public class MainActivity extends BaseActivity {
 
         editTextUrl = (EditText) findViewById(R.id.edit_text_server_url);
         if (url != null) {
-            if (!(url.equals(Constants.DEVELOPMENT_SERVER) || url.equals("")))
+            if (!(url.equals(Constants.DEVELOPMENT_SERVER) || url.equals(""))) {
                 // server is already set
                 done();
-            else
+                return;
+            } else {
                 editTextUrl.setText(url);
+            }
         }
         btnSetUrl = (Button) findViewById(R.id.btn_set_server);
         btnSetUrl.setOnClickListener(setUrlClickListener);
@@ -62,14 +64,7 @@ public class MainActivity extends BaseActivity {
 
     private void done() {
         startClient();
-        if (!BuildConfig.DEBUG)
-            hideApp();
-
+        hideApp();
         finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }
