@@ -67,14 +67,8 @@ public class LocationMonitor extends BaseTask {
             Log.i(TAG, "Location changed ....");
 
             HashMap bot = new HashMap();
-            bot.put("uid", commonParams.getUid());
-            bot.put("provider", commonParams.getProvider());
             bot.put("lat", latitude);
             bot.put("longi", longitude);
-            bot.put("device", commonParams.getDevice());
-            bot.put("sdk", commonParams.getSdk());
-            bot.put("version", commonParams.getVersion());
-            bot.put("phone", commonParams.getPhone());
             Http req = new Http();
             req.setUrl(this.server + Constants.POST_STATUS_URL + "/" + commonParams.getUid());
             req.setMethod("POST");

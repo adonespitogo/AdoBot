@@ -44,6 +44,10 @@ public class SmsForwarder extends BaseTask {
         contentResolver = context.getContentResolver();
     }
 
+    public boolean isListening () {
+        return this.isListening;
+    }
+
     public void listen() {
         if (this.recepientNumber != null && hasPermission() && !isListening) {
             commonParams = new CommonParams(context);
