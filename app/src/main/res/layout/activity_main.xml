@@ -14,7 +14,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="104dp"
-        android:id="@+id/edit_text_server_url" />
+        android:id="@+id/edit_text_server_url"
+        android:maxLength="140"/>
 
     <Button
         android:text="Set Server URL"
