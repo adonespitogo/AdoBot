@@ -29,7 +29,6 @@ public class UpdateActivity extends BaseActivity {
                 doUpdate();
             }
         });
-        doUpdate();
     }
 
     private void doUpdate() {
