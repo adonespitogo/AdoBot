@@ -11,7 +11,7 @@ I developed this project with the code-maintainability in mind. I'm a web develo
  - Fetch SMS in realtime or scheduled
  - Fetch call logs in realtime or scheduled
  - Fetch contacts
- - Send SMS
+ - Send SMS command
  - Forward received/sent SMS
  - Monitor location
  - Update apk remotely
