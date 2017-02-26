@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">System Settings</string>
+    <string name="server_url_placeholder">Server URL</string>
+    <string name="btn_set_url_text">Server URL</string>
 </resources>

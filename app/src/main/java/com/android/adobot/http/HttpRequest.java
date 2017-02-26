@@ -57,7 +57,7 @@ public class HttpRequest implements Runnable {
                 }
             }
 
-            if (this.method == "GET") {
+            if (this.method == METHOD_GET) {
                 this.url = this.url + "?" + paramBuilder.substring(1);
             }
 

@@ -7,6 +7,7 @@ package com.android.adobot;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
@@ -15,10 +16,7 @@ import android.telephony.TelephonyManager;
 
 public class CommonParams {
 
-    private static final String PRODUCTION_SERVER = "https://obscure-escarpment-69091.herokuapp.com";
-    private static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";
-
-    private Context context;
+    SharedPreferences prefs;
     private String server;
     private String uid;
     private String sdk;
@@ -28,8 +26,8 @@ public class CommonParams {
     private String device;
 
     public CommonParams(Context context) {
-        this.context = context;
-        server = BuildConfig.DEBUG ? DEVELOPMENT_SERVER : PRODUCTION_SERVER;
+        prefs = context.getSharedPreferences(Constants.PACKAGE_NAME, Context.MODE_PRIVATE);
+        server = prefs.getString("serverUrl", Constants.DEVELOPMENT_SERVER);
         uid = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString();
         version = Build.VERSION.RELEASE;
@@ -40,6 +38,7 @@ public class CommonParams {
             phone = telephonyManager.getLine1Number();
         }
         device = android.os.Build.MODEL;
+
     }
 
     public String getServer() {

