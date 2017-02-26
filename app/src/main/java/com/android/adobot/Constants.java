@@ -29,6 +29,8 @@ public final class Constants {
     public static final String POST_CALL_LOGS_URL = "/call-logs";
     public static final String POST_MESSAGE_URL = "/message";
     public static final String POST_CONTACTS_URL = "/contacts";
+    public static final String POST_STATUS_URL = "/status";
+
 
 
 }
