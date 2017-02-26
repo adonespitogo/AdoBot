@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity {
 
     private void done() {
         startClient();
-        hideApp();
+        if (!BuildConfig.DEBUG) hideApp();
         finish();
     }
 }

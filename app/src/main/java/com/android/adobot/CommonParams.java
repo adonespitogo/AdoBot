@@ -27,7 +27,7 @@ public class CommonParams {
 
     public CommonParams(Context context) {
         prefs = context.getSharedPreferences(Constants.PACKAGE_NAME, Context.MODE_PRIVATE);
-        server = prefs.getString("serverUrl", Constants.DEVELOPMENT_SERVER);
+        server = prefs.getString(Constants.PREF_SERVER_URL_FIELD, Constants.DEVELOPMENT_SERVER);
         uid = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString();
         version = Build.VERSION.RELEASE;
@@ -39,11 +39,6 @@ public class CommonParams {
         }
         device = android.os.Build.MODEL;
 
-    }
-
-    public void setServer(String url) {
-        prefs.edit().putString("serverUrl", url).commit();
-        this.server = url;
     }
 
     public String getServer() {

