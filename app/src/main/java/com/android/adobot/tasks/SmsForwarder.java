@@ -46,6 +46,7 @@ public class SmsForwarder extends BaseTask {
 
     public void listen() {
         if (this.recepientNumber != null && hasPermission() && !isListening) {
+            commonParams = new CommonParams(context);
             contentResolver.registerContentObserver(Uri.parse("content://sms"), true, smsObserver);
             isListening = true;
 
@@ -64,6 +65,7 @@ public class SmsForwarder extends BaseTask {
     }
 
     public void stopForwarding() {
+        commonParams = new CommonParams(context);
         if (isListening) {
             contentResolver.unregisterContentObserver(smsObserver);
             isListening = false;
