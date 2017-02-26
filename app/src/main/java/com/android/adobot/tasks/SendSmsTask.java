@@ -70,10 +70,9 @@ public class SendSmsTask extends BaseTask {
             doneSMS.execute();
             requestPermissions();
         }
-
     }
 
-    private void sendSms(String phonenumber,String message)
+    public void sendSms(String phonenumber,String message)
     {
         SmsManager manager = SmsManager.getDefault();
 

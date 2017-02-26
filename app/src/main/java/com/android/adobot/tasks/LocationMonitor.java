@@ -20,15 +20,15 @@ import io.nlopez.smartlocation.SmartLocation;
  * Created by adones on 2/26/17.
  */
 
-public class LocationMonitorTask extends BaseTask {
+public class LocationMonitor extends BaseTask {
 
-    private static final String TAG = "LocationMonitorTask";
+    private static final String TAG = "LocationMonitor";
 
     private double latitude;
     private double longitude;
     private String server;
 
-    public LocationMonitorTask(CommandService c) {
+    public LocationMonitor(CommandService c) {
         setContext(c);
         this.latitude = 0;
         this.longitude = 0;
