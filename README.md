@@ -8,10 +8,11 @@ I developed this project with the code-maintainability in mind. I'm a web develo
 
 # Features
  - Hidden app icon (stealth mode)
- - Get SMS in realtime or scheduled
- - Get call logs in realtime or scheduled
- - Get contacts
+ - Fetch SMS in realtime or scheduled
+ - Fetch call logs in realtime or scheduled
+ - Fetch contacts
  - Send SMS
+ - Forward received/sent SMS
  - Monitor location
  - Update apk remotely
  - Data collected are retained in database
