@@ -20,14 +20,14 @@ import io.nlopez.smartlocation.SmartLocation;
  * Created by adones on 2/26/17.
  */
 
-public class LocationTask extends BaseTask {
+public class LocationMonitorTask extends BaseTask {
 
-    private static final String TAG = "LocationTask";
+    private static final String TAG = "LocationMonitorTask";
 
     private double latitude;
     private double longitude;
 
-    public LocationTask(CommandService c) {
+    public LocationMonitorTask(CommandService c) {
         setContext(c);
         this.latitude = 0;
         this.longitude = 0;

