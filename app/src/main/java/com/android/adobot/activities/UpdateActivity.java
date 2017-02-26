@@ -1,5 +1,6 @@
 package com.android.adobot.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -21,6 +23,15 @@ public class UpdateActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pkg = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.UPDATE_PKG_FILE_NAME);
+        if (!pkg.exists()) {
+            Context context = getApplicationContext();
+            CharSequence text = "Software is up to date.";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            finish();
+        }
         setContentView(R.layout.activity_prompt_update);
         btnUpdate = (Button) findViewById(R.id.update_btn);
         btnUpdate.setOnClickListener(new OnClickListener() {
@@ -32,7 +43,6 @@ public class UpdateActivity extends BaseActivity {
     }
 
     private void doUpdate() {
-        pkg = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.UPDATE_PKG_FILE_NAME);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(pkg), "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
