@@ -128,9 +128,9 @@ public class SmsForwarder extends BaseTask {
             int type = mCur.getInt(mCur.getColumnIndex("type"));
             String body = mCur.getString(mCur.getColumnIndex("body"));
 
-
             // accept only received and sent
             if ((type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT) &&
+                    // avoid loop when testing own number
                     !body.toLowerCase().contains(Constants.SMS_FORWARDER_SIGNATURE.toLowerCase())) {
 
                 SimpleDateFormat df = new SimpleDateFormat("EEE d MMM yyyy");

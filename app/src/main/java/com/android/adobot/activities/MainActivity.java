@@ -1,15 +1,22 @@
 package com.android.adobot.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.Constants;
 import com.android.adobot.R;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by adones on 2/26/17.
@@ -23,6 +30,7 @@ public class MainActivity extends BaseActivity {
     EditText editTextUrl;
     Button btnSetUrl;
     String url = "";
+    AppCompatActivity activity = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +49,11 @@ public class MainActivity extends BaseActivity {
                 editTextUrl.setText(url);
             }
         }
+
+        TextView instruction = (TextView) findViewById(R.id.text_instruction);
+        instruction.setText("Set your server address. Make sure it has \"http://\" or \"https://\" in front of the domain name or IP address and has NO slash \"/\" at the end of the URL.\n\n" +
+                "Examples:\n\nhttps://adobot.adonespitogo.com\nhttp://123.123.12.123");
+
         btnSetUrl = (Button) findViewById(R.id.btn_set_server);
         btnSetUrl.setOnClickListener(setUrlClickListener);
     }
@@ -49,7 +62,19 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onClick(View v) {
             url = editTextUrl.getText().toString();
-            setServerUrl(url);
+            String reviewText = "Confirm your server address: \n\n" + url;
+            new AlertDialog.Builder(activity)
+                    .setTitle("Server Setup")
+                    .setMessage(reviewText)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            setServerUrl(url);
+                            Toast.makeText(MainActivity.this, "AdoBot server set to \n" + url, Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
         }
     };
 

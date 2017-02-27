@@ -5,30 +5,6 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp" >
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="text"
-        android:text="Server URL"
-        android:ems="10"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="104dp"
-        android:id="@+id/edit_text_server_url"
-        android:maxLength="140"/>
-
-    <Button
-        android:text="Set Server URL"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_text_server_url"
-        android:layout_marginTop="40dp"
-        android:id="@+id/btn_set_server"
-        android:layout_alignLeft="@+id/edit_text_server_url"
-        android:layout_alignStart="@+id/edit_text_server_url"
-        android:layout_alignRight="@+id/edit_text_server_url"
-        android:layout_alignEnd="@+id/edit_text_server_url" />
-
     <TextView
         android:text="AdoBot Setup"
         android:layout_width="wrap_content"
@@ -38,4 +14,38 @@
         android:layout_marginTop="39dp"
         android:id="@+id/textView2"
         android:textSize="24sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:id="@+id/text_instruction"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:text="Server URL"
+        android:ems="10"
+        android:layout_marginTop="24dp"
+        android:id="@+id/edit_text_server_url"
+        android:maxLength="140"
+        android:layout_below="@+id/text_instruction"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Set Server URL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="66dp"
+        android:id="@+id/btn_set_server"
+        android:layout_below="@+id/edit_text_server_url"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
