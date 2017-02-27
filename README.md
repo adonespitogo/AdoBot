@@ -7,8 +7,8 @@ Opensource Android Spyware
 I developed this project with the code-maintainability in mind. I'm a web developer and not a mobile developer so what you can see here is the best design I could come up. I'm still trying to improve the code base of this app in my spare time for easy maintainance and to encourage other developers to contribute.
 
 # Features
- - realtime command execution
- - schedule commands
+ - Realtime command execution
+ - Schedule commands
  - Hidden app icon (stealth mode)
  - Fetch SMS in
  - Fetch call logs
