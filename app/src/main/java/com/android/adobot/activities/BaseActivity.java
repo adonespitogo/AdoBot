@@ -37,7 +37,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void requestPermissions() {
-        Intent i = new Intent(this, AskPermissionsActivity.class);
+        Intent i = new Intent(this, PermissionsActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }

