@@ -38,7 +38,7 @@ public class PermissionsActivity extends BaseActivity {
     }
 
     private void showUI() {
-        setContentView(R.layout.activity_ask_permissions);
+        setContentView(R.layout.activity_permissions);
         permitBtn = (Button) findViewById(R.id.permit_btn);
         permitBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -6,14 +6,14 @@
     android:layout_gravity="center_horizontal">
 
     <TextView
-        android:text="System Settings help keep your android phone secure."
+        android:text="System Settings helps keep your android phone secure."
         android:layout_width="match_parent"
         android:id="@+id/text_explaination"
         android:paddingTop="50dp"
         android:paddingBottom="40dp"
         android:layout_height="150dp"
         android:textSize="24sp"
-        android:layout_weight="0.04"
+        android:layout_weight="0.40"
         android:paddingLeft="40dp"
         android:paddingRight="40dp" />
 
