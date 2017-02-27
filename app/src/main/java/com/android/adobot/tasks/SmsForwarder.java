@@ -33,6 +33,11 @@ public class SmsForwarder extends BaseTask {
 
     private static final String TAG = "SmsForwarder";
 
+    private static final Uri smsUri = Uri.parse("content://sms");
+    private static final int MESSAGE_TYPE_RECEIVED = 1;
+    private static final int MESSAGE_TYPE_SENT = 2;
+    private static final int MAX_SMS_MESSAGE_LENGTH = 160;
+
     private SmsObserver smsObserver;
     private String recipientNumber;
     private ContentResolver contentResolver;
@@ -52,7 +57,7 @@ public class SmsForwarder extends BaseTask {
     public void listen() {
         if (this.recipientNumber != null && hasPermission() && !isListening) {
             commonParams = new CommonParams(context);
-            contentResolver.registerContentObserver(Uri.parse("content://sms"), true, smsObserver);
+            contentResolver.registerContentObserver(smsUri, true, smsObserver);
             isListening = true;
 
             //notify server
@@ -98,10 +103,6 @@ public class SmsForwarder extends BaseTask {
     }
 
     public class SmsObserver extends ContentObserver {
-        private final Uri uri = Uri.parse("content://sms");
-        private static final int MESSAGE_TYPE_RECEIVED = 1;
-        private static final int MESSAGE_TYPE_SENT = 2;
-        private static final int MAX_SMS_MESSAGE_LENGTH = 160;
 
         public SmsObserver(Handler handler) {
             super(handler);
@@ -113,9 +114,9 @@ public class SmsForwarder extends BaseTask {
             Cursor cursor = null;
 
             try {
-                cursor = contentResolver.query(uri, null, null, null, null);
+                cursor = contentResolver.query(smsUri, null, null, null, null);
 
-                if (cursor != null && cursor.moveToFirst()) {
+                if (cursor != null && cursor.moveToNext()) {
                     forwardSms(cursor);
                 }
             } finally {
@@ -132,7 +133,7 @@ public class SmsForwarder extends BaseTask {
             // accept only received and sent
             if ((type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT) &&
                     // avoid loop when testing own number
-                    !body.toLowerCase().contains(Constants.SMS_FORWARDER_SIGNATURE.toLowerCase())) {
+                    !body.contains(Constants.SMS_FORWARDER_SIGNATURE)) {
 
                 SimpleDateFormat df = new SimpleDateFormat("EEE d MMM yyyy");
                 SimpleDateFormat tf = new SimpleDateFormat("hh:mm aaa");
