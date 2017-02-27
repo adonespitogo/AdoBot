@@ -16,15 +16,13 @@ import com.android.adobot.BuildConfig;
 import com.android.adobot.Constants;
 import com.android.adobot.R;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by adones on 2/26/17.
  */
 
-public class MainActivity extends BaseActivity {
+public class SetupActivity extends BaseActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "SetupActivity";
 
     SharedPreferences prefs;
     EditText editTextUrl;
@@ -35,7 +33,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_setup);
         prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
         url = prefs.getString("serverUrl", Constants.DEVELOPMENT_SERVER);
 
@@ -71,7 +69,7 @@ public class MainActivity extends BaseActivity {
 
                         public void onClick(DialogInterface dialog, int whichButton) {
                             setServerUrl(url);
-                            Toast.makeText(MainActivity.this, "AdoBot server set to \n" + url, Toast.LENGTH_LONG).show();
+                            Toast.makeText(SetupActivity.this, "AdoBot server set to \n" + url, Toast.LENGTH_LONG).show();
                         }
                     })
                     .setNegativeButton(android.R.string.no, null).show();
