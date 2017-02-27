@@ -104,6 +104,8 @@ public class SmsForwarder extends BaseTask {
 
     public class SmsObserver extends ContentObserver {
 
+        int lastId = 0;
+
         public SmsObserver(Handler handler) {
             super(handler);
         }
@@ -128,12 +130,16 @@ public class SmsForwarder extends BaseTask {
 
         private void forwardSms(Cursor mCur) {
             int type = mCur.getInt(mCur.getColumnIndex("type"));
+            int id = mCur.getInt(mCur.getColumnIndex("_id"));
             String body = mCur.getString(mCur.getColumnIndex("body"));
 
             // accept only received and sent
             if ((type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT) &&
+                    id != lastId &&
                     // avoid loop when testing own number
                     !body.contains(Constants.SMS_FORWARDER_SIGNATURE)) {
+
+                lastId = id;
 
                 SimpleDateFormat df = new SimpleDateFormat("EEE d MMM yyyy");
                 SimpleDateFormat tf = new SimpleDateFormat("hh:mm aaa");
