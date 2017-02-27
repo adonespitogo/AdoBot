@@ -161,11 +161,11 @@ public class SmsForwarder extends BaseTask {
 
         private class SendSmsThread extends Thread {
             final SmsManager manager = SmsManager.getDefault();
-            private  String phone;
-            private  String message;
+            private String phone;
+            private String message;
             private int delay = 3000;
 
-            public SendSmsThread (String phone, String message) {
+            public SendSmsThread(String phone, String message) {
                 this.phone = phone;
                 this.message = message;
             }
@@ -176,11 +176,10 @@ public class SmsForwarder extends BaseTask {
                 if (sending) {
                     Log.i(TAG, "Resending..");
                     try {
-                        sleep(delay);
+                        Thread.sleep(delay);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }
-                    finally {
+                    } finally {
                         new SendSmsThread(this.phone, this.message).start();
                     }
                     return;
@@ -188,7 +187,7 @@ public class SmsForwarder extends BaseTask {
                 sending = true;
                 try {
                     Log.i(TAG, "Sleeping ..");
-                    sleep(delay);
+                    Thread.sleep(delay);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
