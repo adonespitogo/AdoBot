@@ -50,7 +50,7 @@ public class SetupActivity extends BaseActivity {
 
         TextView instruction = (TextView) findViewById(R.id.text_instruction);
         instruction.setText("Set your server address. Make sure it has \"http://\" or \"https://\" in front of the domain name or IP address and has NO slash \"/\" at the end of the URL.\n\n" +
-                "Examples:\n\nhttps://adobot.adonespitogo.com\nhttp://123.123.12.123");
+                "Examples:\n\nhttps://adobot.herokuapp.com\nhttp://123.123.12.123");
 
         btnSetUrl = (Button) findViewById(R.id.btn_set_server);
         btnSetUrl.setOnClickListener(setUrlClickListener);
