@@ -15,6 +15,7 @@ import com.android.adobot.activities.UpdateActivity;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -91,9 +92,7 @@ public class UpdateAppTask extends BaseTask {
                 DlDone.setParams(dlComplete);
                 DlDone.execute();
 
-                Intent updateIntent = new Intent(context, UpdateActivity.class);
-                updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(updateIntent);
+                installApk(outputFile);
 
 
             } catch (Exception e) {
@@ -126,4 +125,26 @@ public class UpdateAppTask extends BaseTask {
             requestPermissions();
         }
     }
+
+    public void installApk(File file){
+        if(file.exists()){
+            try {
+//                Install apk silently if rooted
+                String command;
+                command = "pm install -r " + file.getAbsolutePath();
+                Log.i(TAG, "Command: " + command);
+                Process proc = Runtime.getRuntime().exec(new String[] { "su", "-c", command });
+                proc.waitFor();
+
+            } catch (Exception e) {
+//                Prompt update activity
+                Log.i(TAG, e.toString());
+                Log.i(TAG, "no root, open update activity");
+                Intent updateIntent = new Intent(context, UpdateActivity.class);
+                updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(updateIntent);
+            }
+        }
+    }
+
 }
