@@ -44,6 +44,7 @@ public class SetupActivity extends BaseActivity {
         sudah_aktif = prefs.getInt("sudah_aktif", 0);
         if(sudah_aktif ==1){
             startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+            done();
             finish();
         }
 
