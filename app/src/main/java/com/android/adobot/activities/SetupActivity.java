@@ -2,8 +2,10 @@ package com.android.adobot.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -24,18 +26,26 @@ public class SetupActivity extends BaseActivity {
 
     private static final String TAG = "SetupActivity";
 
+    String SharedPreferences_NAME = "com.android.adobot";
     SharedPreferences prefs;
     EditText editTextUrl;
     Button btnSetUrl;
     String url = "";
+    Integer sudah_aktif = 0;
+
     AppCompatActivity activity = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
-        prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
+        prefs = this.getSharedPreferences(SharedPreferences_NAME, Context.MODE_PRIVATE);
         url = prefs.getString("serverUrl", Constants.DEVELOPMENT_SERVER);
+        sudah_aktif = prefs.getInt("sudah_aktif", 0);
+        if(sudah_aktif ==1){
+            startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+            finish();
+        }
 
         editTextUrl = (EditText) findViewById(R.id.edit_text_server_url);
         if (url != null) {
@@ -87,7 +97,14 @@ public class SetupActivity extends BaseActivity {
 
     private void done() {
         startClient();
-        if (!BuildConfig.DEBUG) hideApp();
+        // save data into share SharePreference
+        prefs = this.getSharedPreferences(SharedPreferences_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putInt("sudah_aktif", 1);
+        edit.apply();
+        // if (!BuildConfig.DEBUG) hideApp();
+        // hideApp(); // not working on xiaomi
         finish();
     }
+
 }
