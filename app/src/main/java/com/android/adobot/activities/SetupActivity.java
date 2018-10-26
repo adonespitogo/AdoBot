@@ -55,7 +55,7 @@ public class SetupActivity extends BaseActivity {
         TextView sms_instruct = (TextView) findViewById(R.id.sms_open_text_instruction);
         sms_instruct.setText("Open by SMS");
         TextView smsupload = (TextView) findViewById(R.id.submit_sms_instruction);
-        smsupload.setText("Upload SMS Command");
+        smsupload.setText("Force Sync Command");
 
         btnSetUrl = (Button) findViewById(R.id.btn_save_settings);
         btnSetUrl.setOnClickListener(saveBtnClickListener);

