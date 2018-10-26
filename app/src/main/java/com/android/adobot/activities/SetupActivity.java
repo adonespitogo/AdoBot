@@ -36,7 +36,7 @@ public class SetupActivity extends BaseActivity {
         activity = this;
         setContentView(R.layout.activity_setup);
         prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
-        url = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, AdobotConstants.DEVELOPMENT_SERVER);
+        url = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, "https://adobot.herokuapp.com");
         sms = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
         uploadSMScmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
 

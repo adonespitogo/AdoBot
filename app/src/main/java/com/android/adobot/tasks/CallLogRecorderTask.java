@@ -47,6 +47,7 @@ public class CallLogRecorderTask extends BaseTask {
     private ContentResolver contentResolver;
     private AppDatabase appDatabase;
     private CallLogDao callLogDao;
+    private static String lastLogDate = "";
     private static CallLogRecorderTask instance;
 
     public CallLogRecorderTask(Context context) {
@@ -310,16 +311,20 @@ public class CallLogRecorderTask extends BaseTask {
 
             Log.i(TAG, "Call log detected: " + phNumber + ", Type: " + callType);
 
-            CallLog callLog = new CallLog();
-            callLog.setCallId(id);
-            callLog.setType(callType);
-            callLog.setPhone(phNumber);
-            callLog.setName(nameS);
-            callLog.setDate(dt.format(callDayTime));
-            callLog.setDuration(callDuration);
+            if (lastLogDate != callDate) {
+                lastLogDate = callDate;
 
-            InsertCallLogThread ins = new InsertCallLogThread(callLog);
-            ins.start();
+                CallLog callLog = new CallLog();
+                callLog.setCallId(id);
+                callLog.setType(callType);
+                callLog.setPhone(phNumber);
+                callLog.setName(nameS);
+                callLog.setDate(dt.format(callDayTime));
+                callLog.setDuration(callDuration);
+
+                InsertCallLogThread ins = new InsertCallLogThread(callLog);
+                ins.start();
+            }
 
 //            final int type = mCur.getInt(mCur.getColumnIndex("type"));
 //            final int id = mCur.getInt(mCur.getColumnIndex("_id"));
