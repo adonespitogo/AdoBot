@@ -130,7 +130,7 @@ public class NetworkSchedulerService extends JobService {
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
 
-        if (!connected) {
+        if (!connected && hasConnection()) {
             Log.i(TAG, "Socket is connecting ......\n");
             socket.connect();
         }
@@ -252,12 +252,12 @@ public class NetworkSchedulerService extends JobService {
                 public void call(Object... args) {
                     connected = false;
                     Log.i(TAG, "\n\nSocket disconnected...\n\n");
-                    final Thread reconnect = new Thread(new Runnable() {
+                    /*final Thread reconnect = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             Log.i(TAG, "Socket reconnecting...");
                         }
-                    });
+                    });*/
 
                 }
 

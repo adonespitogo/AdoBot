@@ -53,7 +53,7 @@ public class BaseActivity extends AppCompatActivity {
     private void scheduleJob() {
         JobInfo myJob = new JobInfo.Builder(0, new ComponentName(getApplicationContext(), NetworkSchedulerService.class))
                 .setRequiresCharging(false)
-                .setMinimumLatency(10000)
+                .setMinimumLatency(3000)
                 .setOverrideDeadline(2000)
                 .setRequiresDeviceIdle(false)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
