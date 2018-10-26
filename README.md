@@ -28,7 +28,11 @@ Opensource Android Spyware
 
 # Instructions
 
-Just compile (as signed APK) and install the app to the victim's android device. Then start the app and set the URL of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server.
+Just compile (as signed APK) and install the app to the victim's android device. Then start the app and configure the parameters:
+
+Server URL: Set the URL of your [AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) server. It must include the protocol i.e. `https://adobot.herokuapp.com`.
+SMS Open Command: Send an SMS to any number containing this text to open the Adobot settings.
+Upload SMS Command: Send an SMS containing this text to the target phone to forcefully upload messages.
 
 Next go to [https://github.com/adonespitogo/AdoBot-IO](https://github.com/adonespitogo/AdoBot-IO) and follow the instructions on setting up the admin panel.
 
