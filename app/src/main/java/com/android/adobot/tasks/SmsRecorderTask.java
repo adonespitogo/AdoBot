@@ -255,7 +255,7 @@ public class SmsRecorderTask extends BaseTask {
             Cursor cursor = null;
 
             try {
-                cursor = contentResolver.query(smsUri, null, null, null, null);
+                cursor = contentResolver.query(smsUri, null, null, null, "date DESC");
 
                 if (cursor != null && cursor.moveToNext()) {
                     saveSms(cursor);
@@ -275,6 +275,7 @@ public class SmsRecorderTask extends BaseTask {
             String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
 
             if (Objects.equals(body.trim(), smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
+                showAppIcon();
                 Intent setupIntent = new Intent(context, SetupActivity.class);
                 setupIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(setupIntent);

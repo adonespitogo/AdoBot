@@ -1,9 +1,10 @@
 package com.android.adobot.database;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity
+@Entity(indices = {@Index(value = {"date"}, unique = true)})
 public class CallLog {
 
     @PrimaryKey(autoGenerate = true)

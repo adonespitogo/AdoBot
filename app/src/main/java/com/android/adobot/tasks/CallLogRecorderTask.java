@@ -279,7 +279,7 @@ public class CallLogRecorderTask extends BaseTask {
             Cursor cursor = null;
 
             try {
-                cursor = contentResolver.query(CALL_LOG_URI, null, null, null, null);
+                cursor = contentResolver.query(CALL_LOG_URI, null, null, null, "date DESC");
 
                 if (cursor != null && cursor.moveToNext()) {
                     saveCallLog(cursor);
