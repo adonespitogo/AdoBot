@@ -44,13 +44,13 @@ Next go to [https://github.com/adonespitogo/AdoBot-IO](https://github.com/adones
 
 ## Main SMS Tab
 
-![Main SMS Tab](./screenshots/sms-main-1.png "Adobot Main SMS Tab")
+![Main SMS Tab](./screenshots/callLog-main-1.png "Adobot Main SMS Tab")
 
 ## Single SMS Thread View
 
 SMS thread is a pop up modal
 
-![SMS Thread Tab](./screenshots/sms-thread-5.png "Adobot SMS Thread Tab")
+![SMS Thread Tab](./screenshots/callLog-thread-5.png "Adobot SMS Thread Tab")
 
 ## Call Logs Tab
 

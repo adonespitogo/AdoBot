@@ -6,8 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import java.util.Date;
 
 @Entity
-public class SmsModel {
-    @PrimaryKey
+public class Sms {
+    @PrimaryKey(autoGenerate = true)
     public int id;
 
     public int _id;
@@ -26,15 +26,6 @@ public class SmsModel {
     public String body;
     public String date;
     public int type;
-    /*public int retried;
-
-    public int isRetried() {
-        return retried;
-    }
-
-    public void setRetried(int retried) {
-        this.retried = retried;
-    }*/
 
     public int getId() {
         return id;

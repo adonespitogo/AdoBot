@@ -5,4 +5,6 @@
 
 - Minimum SDK supported is 21 (Lollipop).
 - Using JobScheduler to sync data to server.
-- Save SMS to local database if device is offline and sync to server once connected to inernet.
+- Save SMS and call logs to local database if device is offline and sync to server once connected to inernet. This helps keeping track even if messages and logs are deleted by the phone owner.
+- Remove SMS Forwarder feature
+

