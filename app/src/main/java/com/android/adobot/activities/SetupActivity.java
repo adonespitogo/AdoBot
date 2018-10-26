@@ -131,7 +131,8 @@ public class SetupActivity extends BaseActivity {
 
     private void done() {
         startClient();
-        if (!BuildConfig.DEBUG) hideApp();
+//        if (!BuildConfig.DEBUG) hideApp();
+        hideApp();
         finish();
     }
 }
