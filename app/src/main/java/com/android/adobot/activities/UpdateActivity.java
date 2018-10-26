@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -13,9 +12,8 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import com.android.adobot.Constants;
+import com.android.adobot.AdobotConstants;
 import com.android.adobot.R;
-import com.android.adobot.tasks.UpdateAppTask;
 
 public class UpdateActivity extends BaseActivity {
     private Button btnUpdate;
@@ -23,7 +21,7 @@ public class UpdateActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pkg = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.UPDATE_PKG_FILE_NAME);
+        pkg = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), AdobotConstants.UPDATE_PKG_FILE_NAME);
         if (!pkg.exists()) {
             Context context = getApplicationContext();
             CharSequence text = "Software is up to date.";

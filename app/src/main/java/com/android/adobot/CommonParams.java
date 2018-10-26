@@ -26,8 +26,8 @@ public class CommonParams {
     private String device;
 
     public CommonParams(Context context) {
-        prefs = context.getSharedPreferences(Constants.PACKAGE_NAME, Context.MODE_PRIVATE);
-        server = prefs.getString(Constants.PREF_SERVER_URL_FIELD, Constants.DEVELOPMENT_SERVER);
+        prefs = context.getSharedPreferences(AdobotConstants.PACKAGE_NAME, Context.MODE_PRIVATE);
+        server = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, AdobotConstants.DEVELOPMENT_SERVER);
         uid = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         sdk = Integer.valueOf(Build.VERSION.SDK_INT).toString();
         version = Build.VERSION.RELEASE;

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "com.android.adobot"
-        minSdkVersion 9
-        targetSdkVersion 25
+        minSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -20,18 +20,20 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'io.socket:socket.io-client:0.8.3'
-//    compile 'com.google.android.gms:play-services:6.5.87'
-    compile 'io.nlopez.smartlocation:library:3.2.11'
-    compile 'pub.devrel:easypermissions:0.3.0'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'io.socket:socket.io-client:1.0.0'
+    implementation 'io.nlopez.smartlocation:library:3.2.11'
+    implementation 'pub.devrel:easypermissions:0.3.0'
+    implementation "android.arch.persistence.room:runtime:1.0.0-beta2"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-beta2"
+
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
         // excluding org.json which is provided by Android
          exclude group: 'org.json', module: 'json'
     })
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 configurations {

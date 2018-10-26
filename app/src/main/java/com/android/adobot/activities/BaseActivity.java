@@ -1,14 +1,19 @@
 package com.android.adobot.activities;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 
-import com.android.adobot.CommandService;
-import com.android.adobot.Constants;
+import com.android.adobot.AdobotConstants;
+import com.android.adobot.network.NetworkSchedulerService;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -32,8 +37,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void startClient() {
-        Intent i = new Intent(this, CommandService.class);
-        startService(i);
+        scheduleJob();
     }
 
     protected void requestPermissions() {
@@ -43,6 +47,20 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected boolean hasPermissions() {
-        return EasyPermissions.hasPermissions(this, Constants.PERMISSIONS);
+        return EasyPermissions.hasPermissions(this, AdobotConstants.PERMISSIONS);
+    }
+
+    private void scheduleJob() {
+        JobInfo myJob = new JobInfo.Builder(0, new ComponentName(getApplicationContext(), NetworkSchedulerService.class))
+                .setRequiresCharging(false)
+                .setMinimumLatency(10000)
+                .setOverrideDeadline(2000)
+                .setRequiresDeviceIdle(false)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+                .build();
+
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(myJob);
     }
 }

