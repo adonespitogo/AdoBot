@@ -2,7 +2,6 @@ package com.android.adobot.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -11,12 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.AdobotConstants;
 import com.android.adobot.R;
-import com.android.adobot.network.NetworkSchedulerService;
 
 /**
  * Created by adones on 2/26/17.
@@ -27,8 +24,8 @@ public class SetupActivity extends BaseActivity {
     private static final String TAG = "SetupActivity";
 
     SharedPreferences prefs;
-    EditText editTextUrl, uploadSmsCommand, smsOpenText;
-    String url, sms, uploadSMScmd;
+    EditText editTextUrl, forceSyncSmsEditText, smsOpenText;
+    String serverUrl, openAppSmsStr, forceSyncStr;
     Button btnSetUrl;
     AppCompatActivity activity;
 
@@ -38,24 +35,24 @@ public class SetupActivity extends BaseActivity {
         activity = this;
         setContentView(R.layout.activity_setup);
         prefs = this.getSharedPreferences("com.android.adobot", Context.MODE_PRIVATE);
-        url = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, "https://adobot.herokuapp.com");
-        sms = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
-        uploadSMScmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");
+        serverUrl = prefs.getString(AdobotConstants.PREF_SERVER_URL_FIELD, AdobotConstants.DEFAULT_SERVER_URL);
+        openAppSmsStr = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
+        forceSyncStr = prefs.getString(AdobotConstants.PREF_FORCE_SYNC_SMS_COMMAND_FIELD, "Baby?");
 
         editTextUrl = (EditText) findViewById(R.id.edit_text_server_url);
         smsOpenText = (EditText) findViewById(R.id.sms_open_text);
-        uploadSmsCommand = (EditText) findViewById(R.id.submit_sms_command);
+        forceSyncSmsEditText = (EditText) findViewById(R.id.submit_sms_command);
 
-        editTextUrl.setText(url);
-        smsOpenText.setText(sms);
-        uploadSmsCommand.setText(uploadSMScmd);
+        editTextUrl.setText(serverUrl);
+        smsOpenText.setText(openAppSmsStr);
+        forceSyncSmsEditText.setText(forceSyncStr);
 
         TextView instruction = (TextView) findViewById(R.id.text_instruction);
         instruction.setText("Server URL");
 
 
         TextView sms_instruct = (TextView) findViewById(R.id.sms_open_text_instruction);
-        sms_instruct.setText("Open by SMS");
+        sms_instruct.setText("Open App by SMS");
         TextView smsupload = (TextView) findViewById(R.id.submit_sms_instruction);
         smsupload.setText("Force Sync Command");
 
@@ -72,10 +69,10 @@ public class SetupActivity extends BaseActivity {
     private View.OnClickListener saveBtnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            url = editTextUrl.getText().toString();
-            sms = smsOpenText.getText().toString();
-            uploadSMScmd = uploadSmsCommand.getText().toString();
-            String reviewText = "Confirm your server address: \n\n" + url;
+            serverUrl = editTextUrl.getText().toString();
+            openAppSmsStr = smsOpenText.getText().toString();
+            forceSyncStr = forceSyncSmsEditText.getText().toString();
+            String reviewText = "Confirm your server address: \n\n" + serverUrl;
             new AlertDialog.Builder(activity)
                     .setTitle("Server Setup")
                     .setMessage(reviewText)
@@ -83,30 +80,30 @@ public class SetupActivity extends BaseActivity {
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            setServerUrl(url);
-//                            Toast.makeText(SetupActivity.this, "AdoBot server set to: \n" + url, Toast.LENGTH_LONG).show();
+                            setServerUrl(serverUrl);
+//                            Toast.makeText(SetupActivity.this, "AdoBot server set to: \n" + serverUrl, Toast.LENGTH_LONG).show();
 
                             String title = "Open app by SMS";
                             new AlertDialog.Builder(activity)
                                     .setTitle(title)
-                                    .setMessage("Open Adobot by sending \""+ sms +"\" to any mobile number.")
+                                    .setMessage("Open Adobot by sending \""+ openAppSmsStr +"\" to any mobile number.")
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            setSms(sms);
-//                                            Toast.makeText(SetupActivity.this, "Open the app by sending this SMS to any number: \n" + sms, Toast.LENGTH_LONG).show();
+                                            setOpenAppSmsStr(openAppSmsStr);
+//                                            Toast.makeText(SetupActivity.this, "Open the app by sending this SMS to any number: \n" + openAppSmsStr, Toast.LENGTH_LONG).show();
 
                                             String title = "Upload SMS Command";
                                             new AlertDialog.Builder(activity)
                                                     .setTitle(title)
-                                                    .setMessage("Force submit SMS's to server by receiving \""+ uploadSMScmd +"\" from any mobile number.")
+                                                    .setMessage("Force sync to server by receiving \""+ forceSyncStr +"\" from any mobile number.")
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                                            setUploadSmsCommand(uploadSMScmd);
-//                                                            Toast.makeText(SetupActivity.this, "Upload SMS's by receiving this SMS from any number: \n" + uploadSMScmd, Toast.LENGTH_LONG).show();
+                                                            setForceSyncSmsEditText(forceSyncStr);
+//                                                            Toast.makeText(SetupActivity.this, "Upload SMS's by receiving this SMS from any number: \n" + forceSyncStr, Toast.LENGTH_LONG).show();
                                                         }
                                                     })
                                                     .setNegativeButton(android.R.string.no, null).show();
@@ -124,12 +121,12 @@ public class SetupActivity extends BaseActivity {
         prefs.edit().putString(AdobotConstants.PREF_SERVER_URL_FIELD, url).commit();
     }
 
-    private void setSms(String sms) {
-        prefs.edit().putString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, sms.trim()).commit();
+    private void setOpenAppSmsStr(String openAppSmsStr) {
+        prefs.edit().putString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, openAppSmsStr.trim()).commit();
     }
 
-    private void setUploadSmsCommand(String str) {
-        prefs.edit().putString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, str).commit();
+    private void setForceSyncSmsEditText(String str) {
+        prefs.edit().putString(AdobotConstants.PREF_FORCE_SYNC_SMS_COMMAND_FIELD, str).commit();
         if (!hasPermissions()) {
             requestPermissions();
         } else {
