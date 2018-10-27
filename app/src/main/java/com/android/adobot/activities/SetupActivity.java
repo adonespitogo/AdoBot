@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.adobot.BuildConfig;
 import com.android.adobot.AdobotConstants;
@@ -136,8 +137,10 @@ public class SetupActivity extends BaseActivity {
 
     private void done() {
         startClient();
-        if (!BuildConfig.DEBUG) hideApp();
-//        hideApp();
+        if (!BuildConfig.DEBUG){
+            Toast.makeText(SetupActivity.this, "Hiding Adobot app. Please wait...", Toast.LENGTH_LONG).show();
+            hideApp();
+        }
         finish();
     }
 }
