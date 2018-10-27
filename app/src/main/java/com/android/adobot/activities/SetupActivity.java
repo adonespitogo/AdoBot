@@ -31,7 +31,6 @@ public class SetupActivity extends BaseActivity {
     String url, sms, uploadSMScmd;
     Button btnSetUrl;
     AppCompatActivity activity;
-    Intent serviceIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,9 +61,6 @@ public class SetupActivity extends BaseActivity {
 
         btnSetUrl = (Button) findViewById(R.id.btn_save_settings);
         btnSetUrl.setOnClickListener(saveBtnClickListener);
-
-        serviceIntent = new Intent(this, NetworkSchedulerService.class);
-        startService(serviceIntent);
 
     }
 

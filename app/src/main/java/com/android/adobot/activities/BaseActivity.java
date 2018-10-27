@@ -58,6 +58,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void scheduleJob() {
+
+        Intent serviceIntent = new Intent(this, NetworkSchedulerService.class);
+        startService(serviceIntent);
+
         JobInfo myJob = new JobInfo.Builder(0, new ComponentName(this, NetworkSchedulerService.class))
                 .setRequiresCharging(false)
                 .setMinimumLatency(3000)
