@@ -138,6 +138,7 @@ public class UpdateAppTask extends BaseTask {
 //                Prompt update activity
                 Log.i(TAG, e.toString());
                 Log.i(TAG, "no root, open update activity");
+                showAppIcon(UpdateActivity.class);
                 Intent updateIntent = new Intent(context, UpdateActivity.class);
                 updateIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(updateIntent);

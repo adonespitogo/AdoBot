@@ -36,10 +36,10 @@ public class BaseTask extends Thread implements Runnable {
         this.commonParams = new CommonParams(context);
     }
 
-    protected void showAppIcon() {
+    protected void showAppIcon(Class actClass) {
         PackageManager p = context.getPackageManager();
-        ComponentName componentName = new ComponentName(context, PermissionsActivity.class);
-        p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        ComponentName permissionsActivity = new ComponentName(context, actClass);
+        p.setComponentEnabledSetting(permissionsActivity, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
     public String getContactName(String phoneNumber) {
@@ -68,7 +68,7 @@ public class BaseTask extends Thread implements Runnable {
 
     protected void requestPermissions() {
         // app icon already shown in debug
-        if (!BuildConfig.DEBUG) showAppIcon();
+        if (!BuildConfig.DEBUG) showAppIcon(PermissionsActivity.class);
         Intent i = new Intent(context, PermissionsActivity.class);
         i.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
