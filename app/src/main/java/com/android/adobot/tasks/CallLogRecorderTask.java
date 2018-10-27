@@ -125,10 +125,10 @@ public class CallLogRecorderTask extends BaseTask {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                CallLog m = callLogDao.first();
-                Log.i(TAG, "m = " + m);
-                if (m != null) {
-                    submitSms(m, cb);
+                CallLog log = callLogDao.first();
+                Log.i(TAG, "callLog = " + log);
+                if (log != null) {
+                    submitSms(log, cb);
                 } else
                     cb.onResult(true);
             }

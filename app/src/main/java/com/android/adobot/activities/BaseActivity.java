@@ -6,11 +6,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.android.adobot.AdobotConstants;
 import com.android.adobot.network.NetworkSchedulerService;
@@ -24,6 +29,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 public class BaseActivity extends AppCompatActivity {
+
+    private static final String TAG = "BaseActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -51,7 +58,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void scheduleJob() {
-        JobInfo myJob = new JobInfo.Builder(0, new ComponentName(getApplicationContext(), NetworkSchedulerService.class))
+        JobInfo myJob = new JobInfo.Builder(0, new ComponentName(this, NetworkSchedulerService.class))
                 .setRequiresCharging(false)
                 .setMinimumLatency(3000)
                 .setOverrideDeadline(2000)
@@ -63,4 +70,6 @@ public class BaseActivity extends AppCompatActivity {
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(myJob);
     }
+
+
 }

