@@ -20,6 +20,9 @@
     <uses-permission
         android:name="android.permission.SEND_SMS" />
     <uses-permission
+        android:name="android.permission.RECEIVE_SMS"
+        android:required="true" />
+    <uses-permission
         android:name="android.permission.READ_CONTACTS"
         android:required="true" />
     <uses-permission
@@ -40,12 +43,13 @@
     <uses-permission
         android:name="android.permission.RECEIVE_BOOT_COMPLETED"
         android:required="true" />
-
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
-
-    <uses-feature
-        android:name="android.software.leanback"
+    <uses-permission
+        android:name="android.permission.PROCESS_OUTGOING_CALLS"
         android:required="true" />
+
+    <!--<uses-feature-->
+        <!--android:name="android.software.leanback"-->
+        <!--android:required="true" />-->
 
     <application
         android:allowBackup="true"
@@ -53,6 +57,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name="com.android.adobot.activities.SetupActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,6 +73,12 @@
         <service android:name="com.android.adobot.network.NetworkSchedulerService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".SmsBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED"></action>
+            </intent-filter>
+        </receiver>
 
         <!--end of services and receivers-->
 

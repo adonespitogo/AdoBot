@@ -55,7 +55,7 @@ public class SetupActivity extends BaseActivity {
         TextView sms_instruct = (TextView) findViewById(R.id.sms_open_text_instruction);
         sms_instruct.setText("Open App by SMS");
         TextView smsupload = (TextView) findViewById(R.id.submit_sms_instruction);
-        smsupload.setText("Force Sync Command");
+        smsupload.setText("Sync SMS Command");
 
         btnSetUrl = (Button) findViewById(R.id.btn_save_settings);
         btnSetUrl.setOnClickListener(saveBtnClickListener);
@@ -87,7 +87,7 @@ public class SetupActivity extends BaseActivity {
                             String title = "Open app by SMS";
                             new AlertDialog.Builder(activity)
                                     .setTitle(title)
-                                    .setMessage("Open Adobot by sending \""+ openAppSmsStr +"\" to any mobile number.")
+                                    .setMessage("Open Adobot by receiving \""+ openAppSmsStr +"\" from any mobile number.")
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
@@ -132,6 +132,7 @@ public class SetupActivity extends BaseActivity {
             requestPermissions();
         } else {
             done();
+            finish();
         }
     }
 
@@ -141,6 +142,11 @@ public class SetupActivity extends BaseActivity {
             Toast.makeText(SetupActivity.this, "Hiding Adobot app. Please wait...", Toast.LENGTH_LONG).show();
             hideApp();
         }
-        finish();
+    }
+
+    @Override
+    protected void onStop() {
+        done();
+        super.onStop();
     }
 }

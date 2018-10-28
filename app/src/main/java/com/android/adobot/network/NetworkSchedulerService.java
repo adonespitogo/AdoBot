@@ -60,12 +60,17 @@ public class NetworkSchedulerService extends JobService {
     private NetworkSchedulerService client;
     private JobParameters jobParameters;
     private ConnectivityManager.NetworkCallback networkCallback;
+    private static NetworkSchedulerService instance;
+
+    public static NetworkSchedulerService getInstance () {
+        return instance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         init();
+        instance = this;
 
         Log.i(TAG, "Service created");
     }
@@ -122,14 +127,21 @@ public class NetworkSchedulerService extends JobService {
     public void connect() {
         if (hasConnection() && !connected && socket != null && !socket.connected())
             socket.connect();
+        else if (socket == null) {
+            createSocket(commonParams.getServer());
+            socket.connect();
+        } else {
+            Log.i(TAG, "Unable to connect: No connection");
+        }
     }
 
     public void sync() {
 
         if (is_syncing || !hasConnection()) return;
-
         is_syncing = true;
+
         connect();
+
         smsRecorderTask.submitNextRecord(new SmsRecorderTask.SubmitSmsCallback() {
             @Override
             public void onResult(boolean success) {
