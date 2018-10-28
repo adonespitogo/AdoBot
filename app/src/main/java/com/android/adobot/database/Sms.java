@@ -7,10 +7,17 @@ import java.util.Date;
 
 @Entity
 public class Sms {
+
     @PrimaryKey(autoGenerate = true)
     public int id;
 
     public int _id;
+    public String thread_id;
+    public String phone;
+    public String name;
+    public String body;
+    public String date;
+    public int type;
 
     public int get_id() {
         return _id;
@@ -19,13 +26,6 @@ public class Sms {
     public void set_id(int _id) {
         this._id = _id;
     }
-
-    public String thread_id;
-    public String phone;
-    public String name;
-    public String body;
-    public String date;
-    public int type;
 
     public int getId() {
         return id;

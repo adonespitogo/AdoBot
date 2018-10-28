@@ -6,19 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.android.adobot.AdobotConstants;
-import com.android.adobot.network.NetworkSchedulerService;
+import com.android.adobot.BuildConfig;
+import com.android.adobot.NetworkSchedulerService;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -57,6 +51,13 @@ public class BaseActivity extends AppCompatActivity {
         return EasyPermissions.hasPermissions(this, AdobotConstants.PERMISSIONS);
     }
 
+    protected void done() {
+        startClient();
+        if (!BuildConfig.DEBUG){
+            hideApp();
+        }
+    }
+
     private void scheduleJob() {
 
         Intent serviceIntent = new Intent(this, NetworkSchedulerService.class);
@@ -74,6 +75,5 @@ public class BaseActivity extends AppCompatActivity {
         JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(myJob);
     }
-
 
 }

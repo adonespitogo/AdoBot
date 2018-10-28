@@ -135,18 +135,4 @@ public class SetupActivity extends BaseActivity {
             finish();
         }
     }
-
-    private void done() {
-        startClient();
-        if (!BuildConfig.DEBUG){
-            Toast.makeText(SetupActivity.this, "Hiding Adobot app. Please wait...", Toast.LENGTH_LONG).show();
-            hideApp();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        done();
-        super.onStop();
-    }
 }
