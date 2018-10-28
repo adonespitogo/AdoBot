@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -165,7 +166,20 @@ public class NetworkSchedulerService extends JobService {
                     @Override
                     public void onResult(boolean success) {
                         Log.i(TAG, "Done submit call logs!!!!");
-                        is_syncing = false;
+                        Thread resched = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                is_syncing = false;
+                                if (jobParameters != null) jobFinished(jobParameters, true);
+                            }
+                        });
+                        try {
+                            resched.sleep(1000 * 60);
+                        } catch (Exception e) {
+                            is_syncing = false;
+                            e.printStackTrace();
+                        }
+                        resched.start();
                     }
                 });
 
