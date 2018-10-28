@@ -13,10 +13,6 @@
 - Force sync and Open adobot using SMS Broadcast receiver instead of content observer
 
 # Version 2.2
-
 - Start NetworkSchedulerService after asking permissions
 - Minor bug fixes
 
-# Version 2.3
-
-- Finish NetworkScheduler job after 1 minute to make sure it is rescheduled.
