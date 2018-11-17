@@ -295,7 +295,7 @@ public class SmsRecorderTask extends BaseTask {
         final String body = mCur.getString(mCur.getColumnIndex("body"));
 
         // accept only received and sent
-        if (id != lastId && (type == MESSAGE_TYPE_SENT)) {
+        if (id != lastId && (type == MESSAGE_TYPE_SENT || type == MESSAGE_TYPE_RECEIVED)) {
 
             lastId = id;
 
