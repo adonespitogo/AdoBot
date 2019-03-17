@@ -14,7 +14,7 @@ public final class AdobotConstants {
     public static final String PREF_FORCE_SYNC_SMS_COMMAND_FIELD = "smsForceUpload";
 
     public static final String PREF_SERVER_URL_FIELD = "serverUrl";
-    public static final String DEFAULT_SERVER_URL =  "https://adobot.herokuapp.com";
+    public static final String DEFAULT_SERVER_URL =  "https://your-server.herokuapp.com";
     public static final String DEVELOPMENT_SERVER = "http://192.168.1.251:3000";
     public static final String NOTIFY_URL = "/notify";
     public static final String POST_CALL_LOGS_URL = "/call-logs";
