@@ -1,0 +1,20 @@
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Base64;
+import android.app.WallpaperManager;
+import java.io.IOException;
+public class WallpaperSet {
+    @SuppressLint("ResourceType")
+    public static void setWallpaper(Context applicationContext, String data) {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(applicationContext);
+        byte[] imageBytes = Base64.decode(data, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        try {
+            wallpaperManager.setBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
