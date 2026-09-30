@@ -23,15 +23,13 @@ jobs:
           java-version: '11'
 
       - name: Install dependencies
-        working-directory: android
         run: ./gradlew dependencies
 
       - name: Build APK
-        working-directory: android
         run: ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: app-release.apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
