@@ -24,7 +24,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'io.socket:socket.io-client:1.0.0'
     implementation 'io.nlopez.smartlocation:library:3.2.11'
-    implementation 'pub.devrel:easypermissions:0.3.0'
+    implementation project(':third_party:easypermissions')
     implementation "android.arch.persistence.room:runtime:1.0.0-beta2"
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0-beta2"
 
