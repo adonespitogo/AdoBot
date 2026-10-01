@@ -27,6 +27,10 @@ server/adobot/log/
 server/adobot/logs/
 server/adobot/evidence/
 server/adobot/tmp/
+server/adobot/runtime/*.log
+server/adobot/runtime/*.stdout.log
+server/adobot/runtime/*.pid
+server/adobot/runtime/*.lock
 
 *.pid
 *.lock

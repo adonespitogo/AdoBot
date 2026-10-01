@@ -21,6 +21,9 @@ from telegram.ext import (
 
 from .config import load_config
 from .runtime import build_runtime_status
+from .core.api_client import AdoBotAPIError, get as api_get
+from .core.command_context import audit_command
+from .security.authorization import DEFAULT_POLICY
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +34,37 @@ PID_FILE = ROOT / "run" / "adobot-telegram.pid"
 LOGGER = logging.getLogger("adobot.telegram")
 
 STARTED_MONOTONIC = __import__("time").monotonic()
+
+
+def authorize_command(update: Update, command: str) -> bool:
+    """Fail-closed authorization gate for Telegram commands."""
+
+    user = update.effective_user
+    user_id = user.id if user else None
+
+    if not DEFAULT_POLICY.allows(
+        command,
+        user_id=user_id,
+        admin_only=False,
+    ):
+        audit_command(
+            update,
+            command,
+            outcome="denied",
+        )
+        LOGGER.warning(
+            "telegram command denied command=%s user_id=%s",
+            command.strip().lower().lstrip("/"),
+            user_id,
+        )
+        return False
+
+    audit_command(
+        update,
+        command,
+        outcome="accepted",
+    )
+    return True
 
 
 def configure_logging(level: str) -> None:
@@ -52,6 +86,8 @@ def configure_logging(level: str) -> None:
 
 
 def acquire_pid() -> None:
+    PID_FILE.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+
     if PID_FILE.exists():
         existing = PID_FILE.read_text(encoding="utf-8").strip()
 
@@ -91,6 +127,9 @@ async def start_command(
 ) -> None:
     del context
 
+    if not authorize_command(update, "start"):
+        return
+
     if update.effective_message:
         await update.effective_message.reply_text(
             "AdoBot is online. Use /help for available commands."
@@ -103,11 +142,16 @@ async def help_command(
 ) -> None:
     del context
 
+    if not authorize_command(update, "help"):
+        return
+
     if update.effective_message:
         await update.effective_message.reply_text(
             "/start — initialize AdoBot\n"
             "/help — show this help\n"
-            "/status — show worker status"
+            "/status — show Telegram worker status\n"
+            "/api_status — show AdoBot API health\n"
+            "/api_info — show AdoBot API information"
         )
 
 
@@ -130,6 +174,9 @@ async def status_command(
 ) -> None:
     del context
 
+    if not authorize_command(update, "status"):
+        return
+
     if update.effective_message:
         try:
             status = build_runtime_status(
@@ -143,6 +190,69 @@ async def status_command(
 
         await update.effective_message.reply_text(message)
 
+
+async def api_status_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+    """Return the health status of the local AdoBot API."""
+
+    del context
+
+    if not authorize_command(update, "api_status"):
+        return
+
+    if not update.effective_message:
+        return
+
+    try:
+        result = await api_get("/health")
+    except AdoBotAPIError:
+        await update.effective_message.reply_text(
+            "AdoBot API: unavailable"
+        )
+        return
+
+    payload = result.payload
+
+    await update.effective_message.reply_text(
+        "AdoBot API: "
+        f"{payload.get('status', 'unknown')}\n"
+        f"Environment: {payload.get('environment', 'unknown')}"
+    )
+
+
+async def api_info_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+    """Return non-sensitive information from the local AdoBot API."""
+
+    del context
+
+    if not authorize_command(update, "api_info"):
+        return
+
+    if not update.effective_message:
+        return
+
+    try:
+        result = await api_get("/info")
+    except AdoBotAPIError:
+        await update.effective_message.reply_text(
+            "AdoBot API: unavailable"
+        )
+        return
+
+    payload = result.payload
+
+    await update.effective_message.reply_text(
+        "AdoBot API information\n"
+        f"Service: {payload.get('service', 'unknown')}\n"
+        f"Version: {payload.get('version', 'unknown')}\n"
+        f"Environment: {payload.get('environment', 'unknown')}\n"
+        f"Python: {payload.get('python', 'unknown')}"
+    )
 
 def build_application(token: str) -> Application:
     # Keep ordinary Bot API traffic bounded while giving long-polling its
@@ -176,6 +286,8 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("status", status_command))
+    application.add_handler(CommandHandler("api_status", api_status_command))
+    application.add_handler(CommandHandler("api_info", api_info_command))
     application.add_error_handler(error_handler)
 
     return application

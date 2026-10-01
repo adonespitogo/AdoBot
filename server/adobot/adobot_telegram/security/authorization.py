@@ -52,6 +52,12 @@ class AuthorizationPolicy:
 
 
 DEFAULT_POLICY = AuthorizationPolicy(
-    public_commands=frozenset({"start", "help", "status"}),
+    public_commands=frozenset({
+        "start",
+        "help",
+        "status",
+        "api_status",
+        "api_info",
+    }),
     admin_user_ids=frozenset(),
 )

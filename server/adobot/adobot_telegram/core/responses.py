@@ -17,7 +17,9 @@ START_TEXT: Final[str] = (
 HELP_TEXT: Final[str] = (
     "/start — initialize AdoBot\n"
     "/help — show this help\n"
-    "/status — show worker status"
+    "/status — show Telegram worker status\n"
+    "/api_status — show AdoBot API health\n"
+    "/api_info — show AdoBot API information"
 )
 
 
