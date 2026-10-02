@@ -1,12 +1,74 @@
-*.iml
-/.idea
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+# AdoBot unified repository
+
+# Secrets / local configuration
+.env
+.env.*
+!.env.example
+
+server/adobot/config/.env
+server/adobot/config/.env.*
+!server/adobot/config/.env.example
+
+# Python
+server/adobot/.venv/
+server/adobot/venv/
+server/adobot/**/__pycache__/
+server/adobot/**/*.py[cod]
+server/adobot/.pytest_cache/
+server/adobot/.mypy_cache/
+server/adobot/.ruff_cache/
+server/adobot/.coverage
+server/adobot/htmlcov/
+server/adobot/*.egg-info/
+
+# Runtime state
+server/adobot/run/
+server/adobot/log/
+server/adobot/logs/
+server/adobot/evidence/
+server/adobot/tmp/
+server/adobot/runtime/*.log
+server/adobot/runtime/*.stdout.log
+server/adobot/runtime/*.pid
+server/adobot/runtime/*.lock
+
+*.pid
+*.lock
+*.sock
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Android / Gradle
+android/.gradle/
+android/**/build/
+android/local.properties
+
+# Android packages
+*.apk
+*.aab
+
+# Temporary material
+tmp/
+
+# OS / editor
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-ado-bot-keystore.jks
-app/release
+Thumbs.db
+.vscode/
+.idea/
+
+# Credentials / cryptographic material
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*token*
+*secret*
+*credential*
+
+# Termux-local state
+.termux/
