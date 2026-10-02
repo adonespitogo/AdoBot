@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP_NAME = os.environ.get("APP_NAME", "adobot-server")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "isolated")
 VERSION = "0.1.0"
+STARTED_MONOTONIC = time.monotonic()
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 
@@ -75,6 +76,35 @@ async def info(request: Request) -> JSONResponse:
     )
 
 
+async def diagnostics(request: Request) -> JSONResponse:
+    del request
+
+    uptime_seconds = max(
+        0,
+        int(time.monotonic() - STARTED_MONOTONIC),
+    )
+
+    return JSONResponse(
+        {
+            "service": APP_NAME,
+            "status": "ok",
+            "environment": ENVIRONMENT,
+            "version": VERSION,
+            "python": os.sys.version.split()[0],
+            "pid": os.getpid(),
+            "uptime_seconds": uptime_seconds,
+            "endpoints": [
+                "/",
+                "/api",
+                "/health",
+                "/ready",
+                "/info",
+                "/diagnostics",
+            ],
+        }
+    )
+
+
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         started = time.monotonic()
@@ -127,6 +157,7 @@ routes = [
     Route("/health", health, methods=["GET"]),
     Route("/ready", ready, methods=["GET"]),
     Route("/info", info, methods=["GET"]),
+    Route("/diagnostics", diagnostics, methods=["GET"]),
 ]
 
 app = Starlette(

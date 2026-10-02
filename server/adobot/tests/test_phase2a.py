@@ -3,6 +3,11 @@ from __future__ import annotations
 import json
 
 from adobot_telegram.audit.events import AuditEvent, new_event
+from adobot_telegram.core.diagnostics import (
+    REQUIRED_KEYS,
+    format_diagnostics,
+    validate_diagnostics_payload,
+)
 from adobot_telegram.core.responses import (
     HELP_TEXT,
     START_TEXT,
@@ -95,3 +100,72 @@ def test_new_event_has_utc_timestamp() -> None:
 
     assert event.timestamp_utc.endswith("Z")
     assert event.outcome == "accepted"
+
+
+def test_diagnostics_schema_accepts_complete_payload():
+    payload = {
+        "service": "adobot-server",
+        "status": "ok",
+        "environment": "isolated",
+        "version": "0.1.0",
+        "python": "3.13.13",
+        "pid": 1234,
+        "uptime_seconds": 42,
+        "endpoints": [
+            "/",
+            "/api",
+            "/health",
+            "/ready",
+            "/info",
+            "/diagnostics",
+        ],
+    }
+
+    assert set(payload) == REQUIRED_KEYS
+    assert validate_diagnostics_payload(payload) == payload
+    assert "AdoBot Diagnostics" in format_diagnostics(payload)
+
+
+def test_diagnostics_schema_rejects_extra_field():
+    payload = {
+        "service": "adobot-server",
+        "status": "ok",
+        "environment": "isolated",
+        "version": "0.1.0",
+        "python": "3.13.13",
+        "pid": 1234,
+        "uptime_seconds": 42,
+        "endpoints": ["/diagnostics"],
+        "secret": "must-not-be-accepted",
+    }
+
+    try:
+        validate_diagnostics_payload(payload)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "extra diagnostics field was accepted"
+        )
+
+
+def test_diagnostics_schema_rejects_invalid_pid():
+    payload = {
+        "service": "adobot-server",
+        "status": "ok",
+        "environment": "isolated",
+        "version": "0.1.0",
+        "python": "3.13.13",
+        "pid": -1,
+        "uptime_seconds": 42,
+        "endpoints": ["/diagnostics"],
+    }
+
+    try:
+        validate_diagnostics_payload(payload)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(
+            "invalid PID was accepted"
+        )

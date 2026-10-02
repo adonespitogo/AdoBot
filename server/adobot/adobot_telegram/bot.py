@@ -23,6 +23,7 @@ from .config import load_config
 from .runtime import build_runtime_status
 from .core.api_client import AdoBotAPIError, get as api_get
 from .core.command_context import audit_command
+from .core.diagnostics import format_diagnostics
 from .core.responses import HELP_TEXT
 from .security.authorization import DEFAULT_POLICY
 
@@ -148,6 +149,34 @@ async def help_command(
 
     if update.effective_message:
         await update.effective_message.reply_text(HELP_TEXT)
+
+
+async def diagnostics_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+    del context
+
+    if not authorize_command(update, "diagnostics"):
+        return
+
+    if not update.effective_message:
+        return
+
+    try:
+        result = await api_get("/diagnostics")
+        text = format_diagnostics(result.payload)
+    except (AdoBotAPIError, ValueError, TypeError) as exc:
+        LOGGER.warning(
+            "diagnostics request failed type=%s",
+            type(exc).__name__,
+        )
+        await update.effective_message.reply_text(
+            "AdoBot diagnostics unavailable."
+        )
+        return
+
+    await update.effective_message.reply_text(text)
 
 
 async def error_handler(
@@ -365,6 +394,7 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("api_status", api_status_command))
     application.add_handler(CommandHandler("api_ready", api_ready_command))
     application.add_handler(CommandHandler("api_info", api_info_command))
+    application.add_handler(CommandHandler("diagnostics", diagnostics_command))
     application.add_error_handler(error_handler)
 
     return application
