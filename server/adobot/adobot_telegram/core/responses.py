@@ -19,6 +19,7 @@ HELP_TEXT: Final[str] = (
     "/help — show this help\n"
     "/status — show Telegram worker status\n"
     "/api_status — show AdoBot API health\n"
+    "/api_root — show AdoBot API surface\n"
     "/api_ready — show AdoBot API readiness\n"
     "/api_info — show AdoBot API information"
 )

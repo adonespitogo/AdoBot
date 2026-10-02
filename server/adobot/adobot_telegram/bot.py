@@ -147,13 +147,7 @@ async def help_command(
         return
 
     if update.effective_message:
-        await update.effective_message.reply_text(
-            "/start — initialize AdoBot\n"
-            "/help — show this help\n"
-            "/status — show Telegram worker status\n"
-            "/api_status — show AdoBot API health\n"
-            "/api_info — show AdoBot API information"
-        )
+        await update.effective_message.reply_text(HELP_TEXT)
 
 
 async def error_handler(
@@ -190,6 +184,55 @@ async def status_command(
             message = "AdoBot Telegram worker: status unavailable"
 
         await update.effective_message.reply_text(message)
+
+
+
+async def api_root_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+    """Return the safe, non-sensitive AdoBot API surface."""
+
+    del context
+
+    if not authorize_command(update, "api_root"):
+        return
+
+    if not update.effective_message:
+        return
+
+    try:
+        result = await api_get("/api")
+    except AdoBotAPIError:
+        await update.effective_message.reply_text(
+            "AdoBot API: unavailable"
+        )
+        return
+
+    payload = result.payload
+    api = payload.get("api", {})
+
+    if not isinstance(api, dict):
+        await update.effective_message.reply_text(
+            "AdoBot API: invalid surface response"
+        )
+        return
+
+    lines = [
+        "AdoBot API",
+        f"Service: {payload.get('service', 'unknown')}",
+        f"Version: {payload.get('version', 'unknown')}",
+        f"Environment: {payload.get('environment', 'unknown')}",
+        "",
+        "Available API:",
+    ]
+
+    for name in ("health", "ready", "info"):
+        path = api.get(name)
+        if isinstance(path, str):
+            lines.append(f"{name}: {path}")
+
+    await update.effective_message.reply_text("\n".join(lines))
 
 
 async def api_status_command(
@@ -318,6 +361,7 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("status", status_command))
+    application.add_handler(CommandHandler("api_root", api_root_command))
     application.add_handler(CommandHandler("api_status", api_status_command))
     application.add_handler(CommandHandler("api_ready", api_ready_command))
     application.add_handler(CommandHandler("api_info", api_info_command))

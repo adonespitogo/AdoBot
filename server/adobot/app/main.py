@@ -104,7 +104,25 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         return response
 
 
+
+async def api_root(request: Request) -> JSONResponse:
+    return JSONResponse(
+        {
+            "service": APP_NAME,
+            "status": "ok",
+            "environment": ENVIRONMENT,
+            "version": VERSION,
+            "api": {
+                "health": "/health",
+                "ready": "/ready",
+                "info": "/info",
+            },
+        }
+    )
+
+
 routes = [
+    Route("/api", api_root, methods=["GET"]),
     Route("/", index, methods=["GET"]),
     Route("/health", health, methods=["GET"]),
     Route("/ready", ready, methods=["GET"]),

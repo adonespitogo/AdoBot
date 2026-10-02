@@ -58,6 +58,7 @@ DEFAULT_POLICY = AuthorizationPolicy(
         "status",
         "api_status",
         "api_ready",
+        "api_root",
         "api_info",
     }),
     admin_user_ids=frozenset(),
