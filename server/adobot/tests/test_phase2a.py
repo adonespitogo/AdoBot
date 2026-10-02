@@ -30,6 +30,7 @@ def test_help_response_preserves_existing_behavior() -> None:
     assert "/start — initialize AdoBot" in response.text
     assert "/help — show this help" in response.text
     assert "/status — show Telegram worker status" in response.text
+    assert "/api_ready — show AdoBot API readiness" in response.text
 
 
 def test_text_response_rejects_invalid_values() -> None:

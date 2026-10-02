@@ -12,7 +12,7 @@ from typing import Any
 
 API_BASE_URL = "http://127.0.0.1:8080"
 DEFAULT_TIMEOUT_SECONDS = 3.0
-ALLOWED_PATHS = frozenset({"/health", "/info"})
+ALLOWED_PATHS = frozenset({"/health", "/ready", "/info"})
 
 
 class AdoBotAPIError(RuntimeError):

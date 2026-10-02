@@ -23,6 +23,7 @@ from .config import load_config
 from .runtime import build_runtime_status
 from .core.api_client import AdoBotAPIError, get as api_get
 from .core.command_context import audit_command
+from .core.responses import HELP_TEXT
 from .security.authorization import DEFAULT_POLICY
 
 
@@ -222,6 +223,37 @@ async def api_status_command(
     )
 
 
+async def api_ready_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+    """Return the readiness state of the local AdoBot API."""
+
+    del context
+
+    if not authorize_command(update, "api_ready"):
+        return
+
+    if not update.effective_message:
+        return
+
+    try:
+        result = await api_get("/ready")
+    except AdoBotAPIError:
+        await update.effective_message.reply_text(
+            "AdoBot API: unavailable"
+        )
+        return
+
+    payload = result.payload
+
+    await update.effective_message.reply_text(
+        "AdoBot API: "
+        f"{payload.get('status', 'unknown')}\n"
+        f"Environment: {payload.get('environment', 'unknown')}"
+    )
+
+
 async def api_info_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -287,6 +319,7 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("status", status_command))
     application.add_handler(CommandHandler("api_status", api_status_command))
+    application.add_handler(CommandHandler("api_ready", api_ready_command))
     application.add_handler(CommandHandler("api_info", api_info_command))
     application.add_error_handler(error_handler)
 
